@@ -1,0 +1,10 @@
+{
+  "name": "openfin-template",
+  "version": "0.0.0",
+  "devDependencies": {
+    "@types/openfin": "^39.0.0",
+    "live-server": "^1.2.0",
+    "openfin-launcher": "^1.4.4"
+  },
+  "license": "Apache-2.0"
+}

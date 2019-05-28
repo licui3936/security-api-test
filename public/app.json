@@ -1,0 +1,53 @@
+{
+    "devtools_port": 9090,
+    "licenseKey": "64605fac-add3-48a0-8710-64b38e96a2dd",
+    "startup_app": {
+        "name": "OpenfinPOCName",
+        "url": "http://localhost:5566/index.html",
+        "uuid": "OpenfinPOC",
+        "icon": "http://localhost:5566/favicon.ico",
+        "autoShow": true,
+        "saveWindowState": false,
+        "backgroundColor": "#aabbcc",
+        "waitForPageLoad": false,
+        "alphaMask": {
+            "red": 200,
+            "green": 200,
+            "blue": 200
+        },
+        "accelerator": {
+            "zoom": true
+        },
+        "cornerRounding": {
+            "width": 20,
+            "height": 20
+        },
+        "defaultWidth": 1000,
+        "defaultHeight": 500,
+        "aspectRatio": 2,
+        "frame": true,
+        "nonPersistent": false,
+        "resizable": true,
+        "permissions": {
+            "System": {
+				"launchExternalProcess": true
+			}
+        }
+    },
+    "runtime": {
+        "arguments": "--inspect=9222 --v=1",
+        "version": "canary"
+    },
+    "shortcut": {
+        "company": "OpenFin",
+        "description": "Openfin POC",
+        "icon": "http://localhost:5566/favicon.ico",
+        "name": "Openfin POC"
+    },
+    "supportInformation": {
+        "company": "Company Name",
+        "product": "Product Name",
+        "email": "support@company.com",
+        "forwardErrorReports": true
+    }
+}
