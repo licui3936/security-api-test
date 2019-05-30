@@ -23,15 +23,15 @@
             "height": 20
         },
         "defaultWidth": 1000,
-        "defaultHeight": 500,
+        "defaultHeight": 600,
         "aspectRatio": 2,
         "frame": true,
         "nonPersistent": false,
         "resizable": true,
         "permissions": {
             "System": {
-				"launchExternalProcess": true
-			}
+                "launchExternalProcess": true
+            }
         }
     },
     "runtime": {

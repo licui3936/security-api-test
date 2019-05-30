@@ -25,15 +25,6 @@
     <button onclick="updateAPICall()">Execute</button>
     <br><br>
     <p><h3>API call response: </h3><span id="api-response" style="color: green"></span></p>
-    <br>
-    <h3>Launch Child App/Window with Options Object</h3>
-    <input type="radio" name="childPermission" value="inherited" checked> Permission Inherited from Parent (only false permission inherited)<br>
-    <input type="radio" name="childPermission" value="passedIn"> Pass in Permission <input type="checkbox" id="child-permission-check">Permission: True    
-    <br><br>
-    <button onclick="createChildApp()">Open Child App</button>&nbsp;&nbsp;&nbsp;&nbsp;<button onclick="createChildWindow()">Open Child Window</button>
-    <br>
-    <h3>Launch Child App from Manifest Url(Url not matching, use default permission settins)</h3>
-    <button onclick="createChildAppFromManifest()">Open Child App from Manifest Url</button>
   </div>  
   <script src="js/main.js"></script>
 </body>
