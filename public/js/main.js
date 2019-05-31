@@ -9,14 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 //Once the DOM has loaded and the OpenFin API is ready
-function onMain() {
-  const app = fin.desktop.Application.getCurrent();
-  const win = fin.desktop.Window.getCurrent();
-
-  //const app = fin.Application.getCurrentSync();
-  //const win = fin.Window.getCurrentSync();
-  const uuid = app.uuid? app.uuid : app.identity.uuid;
-  
+function onMain() { 
   //fin.desktop.System.showDeveloperTools(uuid, uuid);
   fin.desktop.System.getVersion(version => {
     const ofVersion = document.querySelector("#of-version");
@@ -24,7 +17,7 @@ function onMain() {
   });
 }
 
-function updateAPICall(){
+function executeAPICall(){
   const apiOption = document.querySelector("#apiSelect").value;
   const apiResponse = document.querySelector("#api-response");
   const permissionChk = document.querySelector("#permission-check");
@@ -70,7 +63,7 @@ function isInheritedPermission()
 
 function createChildWindow() {
   const isInherited = isInheritedPermission();
-  const permissionChk = document.querySelector("#child-permission-check");
+  const permissionValue = document.querySelector("#permissionSel").value === 'true' ? true : false;
   let winOption = {
       name:'child' + Math.random(),
       defaultWidth: 600,
@@ -82,7 +75,7 @@ function createChildWindow() {
   if(!isInherited) {
     winOption.permissions = {
       System: {
-          launchExternalProcess: permissionChk.checked
+          launchExternalProcess: permissionValue
       }
     };
   }
@@ -91,7 +84,7 @@ function createChildWindow() {
 
 function createChildApp() {
   const isInherited = isInheritedPermission();
-  const permissionChk = document.querySelector("#child-permission-check");
+  const permissionValue = document.querySelector("#permissionSel").value === 'true' ? true : false;
   let option = {
       uuid:'child' + Math.random(),
       name:'child',
@@ -104,7 +97,7 @@ function createChildApp() {
   if(!isInherited) {
     option.permissions = {
       System: {
-          launchExternalProcess: permissionChk.checked
+          launchExternalProcess: permissionValue
       }
     };
   }

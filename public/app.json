@@ -2,9 +2,9 @@
     "devtools_port": 9090,
     "licenseKey": "64605fac-add3-48a0-8710-64b38e96a2dd",
     "startup_app": {
-        "name": "OpenfinPOCName",
+        "name": "apiPermissionTest",
         "url": "http://localhost:5566/index.html",
-        "uuid": "OpenfinPOC",
+        "uuid": "apiPermissionTest",
         "icon": "http://localhost:5566/favicon.ico",
         "autoShow": true,
         "saveWindowState": false,
@@ -40,9 +40,9 @@
     },
     "shortcut": {
         "company": "OpenFin",
-        "description": "Openfin POC",
+        "description": "API Permissions Test",
         "icon": "http://localhost:5566/favicon.ico",
-        "name": "Openfin POC"
+        "name": "API Permissions Test"
     },
     "supportInformation": {
         "company": "Company Name",

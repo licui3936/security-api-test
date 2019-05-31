@@ -22,13 +22,13 @@
       <option value="terminateExternalProcess">terminateExternalProcess</option>
     </select>
     <input type="checkbox" id="permission-check">Set Permission True in Window.UpdateOptions
-    <button onclick="updateAPICall()">Execute</button>
+    <button onclick="executeAPICall()">Execute</button>
     <br><br>
     <p><h3>API call response: </h3><span id="api-response" style="color: green"></span></p>
     <br>
     <h3>Launch Child App/Window with Options Object</h3>
-    <input type="radio" name="childPermission" value="inherited" checked> Permission Inherited from Parent (only false permission inherited)<br>
-    <input type="radio" name="childPermission" value="passedIn"> Pass in Permission <input type="checkbox" id="child-permission-check">Permission: True    
+    <input type="radio" name="childPermission" value="inherited" checked> Permission Inherited from Parent<br>
+    <input type="radio" name="childPermission" value="passedIn">Pass in Permission: <select id="permissionSel"><option value="true">True</option><option value="false">False</option></select>
     <br><br>
     <button onclick="createChildApp()">Open Child App</button>&nbsp;&nbsp;&nbsp;&nbsp;<button onclick="createChildWindow()">Open Child Window</button>
     <br>
