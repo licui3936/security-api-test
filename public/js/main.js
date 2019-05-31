@@ -104,13 +104,18 @@ function createChildApp() {
   fin.Application.start(option);
 }
 
-function createChildAppFromManifest() {
-  //fin.Application.startFromManifest('http://localhost:5566/childapp.json');
-  fin.Application.startFromManifest('http://localhost:5566/childapp.json').then(app => console.log('App is running')).catch(err => console.log(err));
-  /* 
-  fin.desktop.Application.createFromManifest('http://localhost:5566/childapp.json', function(app) {
-    app.run();
-  }, function(error) {
-    console.error('Failed to create app from manifest: ', error);
-  }); */ 
+function createAppFromManifest() {
+  const useCase = document.querySelector("#manifestSelect").value;  
+  if(useCase === '0') { // no match url
+    fin.Application.startFromManifest('http://localhost:5566/appNoMatch.json').then(app => console.log('App is running')).catch(err => console.log(err));
+  }
+  else if(useCase === '1') { // match ulr, permissions missing in manifest
+    fin.Application.startFromManifest('http://localhost:5566/appMatchPermissionMissing.json').then(app => console.log('App is running')).catch(err => console.log(err));
+  }
+  else if(useCase === '2') { // match ulr, permissions true in manifest
+    fin.Application.startFromManifest('http://localhost:5566/appMatchPermissionTrue.json').then(app => console.log('App is running')).catch(err => console.log(err));
+  } 
+  else if(useCase === '3') { // match ulr, permissions false in manifest
+    fin.Application.startFromManifest('http://localhost:5566/appMatchPermissionFalse.json').then(app => console.log('App is running')).catch(err => console.log(err));
+  }    
 }

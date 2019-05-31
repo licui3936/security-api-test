@@ -1,0 +1,35 @@
+{
+
+    "desktopSettings": {
+        "assetsUrl": "http://localhost:8000/",
+        "lrsUrl": "http://localhost:8000/services",
+        "cleanUnusedRuntimes": true,
+        "unusedRuntimeExpirationInMinutes": "43200",
+        "enableDesktopShortcut": true,
+        "enableStartMenuShortcut": true,
+        "enableStartupShortcut": true,
+        "disableShortcutCreation": false,
+        "startMenuRootFolder": "CompanyName",
+
+        "network": {
+            "readTimeout": 10,
+            "sendTimeout": 10,
+            "receiveTimeout": 10,
+            "connectTimeout": 10
+        },
+
+        "applicationLogging": {
+            "maxAppLogFileSizeMB": 10000,
+            "maxAppLogFiles": 10
+        }
+    },
+
+    "services": [{
+        "name": "layouts",
+        "config": {
+            "features": {
+                "dock": false
+            }
+        }
+    }]
+}

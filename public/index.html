@@ -27,13 +27,19 @@
     <p><h3>API call response: </h3><span id="api-response" style="color: green"></span></p>
     <br>
     <h3>Launch Child App/Window with Options Object</h3>
-    <input type="radio" name="childPermission" value="inherited" checked> Permission Inherited from Parent<br>
+    <input type="radio" name="childPermission" value="inherited" checked>No Permission Passed In<br>
     <input type="radio" name="childPermission" value="passedIn">Pass in Permission: <select id="permissionSel"><option value="true">True</option><option value="false">False</option></select>
     <br><br>
     <button onclick="createChildApp()">Open Child App</button>&nbsp;&nbsp;&nbsp;&nbsp;<button onclick="createChildWindow()">Open Child Window</button>
     <br>
-    <h3>Launch Child App from Manifest Url(Url not matching, use default permission settins)</h3>
-    <button onclick="createChildAppFromManifest()">Open Child App from Manifest Url</button>
+    <h3>Launch An App from manifest Url</h3>
+    <select id="manifestSelect">
+      <option value="0">non matched manifest url, use default settings</option>
+      <option value="1">matched manifest url, permissions not specified in manifest file</option>
+      <option value="2">matched manifest url, permissions set to true in manifest file</option>
+      <option value="3">matched manifest url, permissions set to false in manifest file</option>
+    </select>    
+    <button onclick="createAppFromManifest()">Launch App</button>
   </div>  
   <script src="js/main.js"></script>
 </body>

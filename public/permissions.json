@@ -10,7 +10,7 @@
 			}	
 		},
       "MyPolicies": {
-        "urls": ["http://localhost:5566/app.json"],
+        "urls": ["http://localhost:5566/app.json", "http://localhost:5566/appMatchPermissionMissing.json", "http://localhost:5566/appMatchPermissionTrue.json", "http://localhost:5566/appMatchPermissionFalse.json"],
         "permissions": {
           "System": {
             "downloadAsset": false,
