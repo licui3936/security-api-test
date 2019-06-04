@@ -27,7 +27,7 @@
         "aspectRatio": 2,
         "frame": true,
         "nonPersistent": false,
-        "resizable": true
+        "resizable": true    
     },
     "runtime": {
         "arguments": "--inspect=9222 --v=1",

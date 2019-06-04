@@ -34,12 +34,14 @@
     <br>
     <h3>Launch An App from manifest Url</h3>
     <select id="manifestSelect">
-      <option value="0">non matched manifest url, use default settings</option>
-      <option value="1">matched manifest url, permissions not specified in manifest file</option>
-      <option value="2">matched manifest url, permissions set to true in manifest file</option>
-      <option value="3">matched manifest url, permissions set to false in manifest file</option>
+      <option value="0">no matched manifest url, permissions not specified in manifest file</option>      
+      <option value="1">no matched manifest url, permission true in manifest file</option>
+      <option value="2">no matched manifest url, permission false in manifest file</option>      
+      <option value="3">matched manifest url, permissions not specified in manifest file</option>
+      <option value="4">matched manifest url, permissions set to true in manifest file</option>
+      <option value="5">matched manifest url, permissions set to false in manifest file</option>
     </select>    
-    <button onclick="createAppFromManifest()">Launch App</button>
+    <button onclick="createAppFromManifest()">Launch</button>
   </div>  
   <script src="js/main.js"></script>
 </body>

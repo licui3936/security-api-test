@@ -14,7 +14,7 @@
         "permissions": {
           "System": {
             "downloadAsset": false,
-            "launchExternalProcess": true,
+            "launchExternalProcess": false,
             "readRegistryValue": false,
             "terminateExternalProcess": false
           }
@@ -23,7 +23,7 @@
       "default": {
         "permissions": {
           "System": {
-            "launchExternalProcess": false
+            "launchExternalProcess": true
           }
         }
       }

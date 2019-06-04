@@ -105,17 +105,23 @@ function createChildApp() {
 }
 
 function createAppFromManifest() {
-  const useCase = document.querySelector("#manifestSelect").value;  
-  if(useCase === '0') { // no match url
-    fin.Application.startFromManifest('http://localhost:5566/appNoMatch.json').then(app => console.log('App is running')).catch(err => console.log(err));
+  const useCase = document.querySelector("#manifestSelect").value;
+  if(useCase === '0') { // no match url, use default settins,  permission missing in manifest
+    fin.Application.startFromManifest('http://localhost:5566/appNoMatchPermissionMissing.json').then(app => console.log('App is running')).catch(err => console.log(err));
+  }  
+  else if(useCase === '1') { // no match url, use default settins,  permission true in manifest
+    fin.Application.startFromManifest('http://localhost:5566/appNoMatchPermissionTrue.json').then(app => console.log('App is running')).catch(err => console.log(err));
   }
-  else if(useCase === '1') { // match ulr, permissions missing in manifest
+  else if(useCase === '2') { // no match url, use default settings, permission false in manifest
+    fin.Application.startFromManifest('http://localhost:5566/appNoMatchPermissionFalse.json').then(app => console.log('App is running')).catch(err => console.log(err));
+  }
+  else if(useCase === '3') { // match url, permissions missing in manifest
     fin.Application.startFromManifest('http://localhost:5566/appMatchPermissionMissing.json').then(app => console.log('App is running')).catch(err => console.log(err));
   }
-  else if(useCase === '2') { // match ulr, permissions true in manifest
+  else if(useCase === '4') { // match url, permissions true in manifest
     fin.Application.startFromManifest('http://localhost:5566/appMatchPermissionTrue.json').then(app => console.log('App is running')).catch(err => console.log(err));
   } 
-  else if(useCase === '3') { // match ulr, permissions false in manifest
+  else if(useCase === '5') { // match url, permissions false in manifest
     fin.Application.startFromManifest('http://localhost:5566/appMatchPermissionFalse.json').then(app => console.log('App is running')).catch(err => console.log(err));
   }    
 }
