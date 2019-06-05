@@ -1,14 +1,14 @@
 {  
     "applicationSettings": {
-		"file:///Z:/dev/security-api-test/public/app.json":{
-	        "permissions": {
-			  "System": {
-				"downloadAsset": false,
-				"readRegistryValue": false,
-				"terminateExternalProcess": false
-			  }
-			}	
-		},
+      "file:///Z:/dev/security-api-test/public/app.json": {
+	      "permissions": {
+			    "System": {
+				    "downloadAsset": false,
+				    "readRegistryValue": false,
+				    "terminateExternalProcess": false
+			    }
+			  }	
+		  },
       "MyPolicies": {
         "urls": ["http://localhost:5566/app.json", "http://localhost:5566/appMatchPermissionMissing.json", "http://localhost:5566/appMatchPermissionTrue.json", "http://localhost:5566/appMatchPermissionFalse.json"],
         "permissions": {
@@ -19,7 +19,13 @@
             "terminateExternalProcess": false
           }
         }
-      }
-
+      },
+      "default": {
+        "permissions": {
+          "System": {
+            "launchExternalProcess": false
+          }
+        }
+      }    
     }
   }

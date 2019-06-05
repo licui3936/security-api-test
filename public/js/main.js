@@ -44,9 +44,9 @@ function executeAPICall(){
             console.log('the exit code', result.exitCode);
         }
     },  (payload) => {    
-        apiResponse.innerHTML = "<span style='color: green'>'Success:' " + payload.uuid + "</span>";
+        apiResponse.innerHTML = "<span style='color: green'>Success: " + payload.uuid + "</span>";
     }, (error) => {
-        apiResponse.innerHTML = "<span style='color: red'>'Error:' " + error + "</span>";
+        apiResponse.innerHTML = "<span style='color: red'>Error: " + error + "</span>";
     });
   }
   else {
@@ -91,6 +91,7 @@ function createWindow() {
 }
 
 function createIframeWindow() {
+  const isInherited = isInheritedPermission();
   const permissionValue = document.querySelector("#permissionSel").value === 'true' ? true : false;  
   let winOption = {
     name:'child' + Math.random(),
@@ -98,11 +99,16 @@ function createIframeWindow() {
     defaultHeight: 600,
     url: 'http://localhost:5566/iframe.html',
     frame: true,
-    autoShow: true,
-    permissions: {
-      launchExternalProcess: permissionValue
-    }
+    autoShow: true
   };
+
+  if(!isInherited) {
+    winOption.permissions = {
+      System: {
+          launchExternalProcess: permissionValue
+      }
+    };
+  }  
   fin.Window.create(winOption);
 }
 
