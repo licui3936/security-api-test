@@ -10,10 +10,7 @@
 
 <body>
   <div>
-    <h1>OpenFin Security API Test Harness</h1>
-    <p id="version-number-container">
-      Current runtime version: <span id="of-version"></span>
-    </p>
+    <h1>OpenFin Security API Test - Child Window</h1>
     <h3>Secured APIs in Phase 1</h3>
     <select id="apiSelect">
       <option value="downloadAsset">downloadAsset</option>
@@ -21,7 +18,9 @@
       <option value="readRegistryValue">readRegistryValue</option>
       <option value="terminateExternalProcess">terminateExternalProcess</option>
     </select>
+    <!--
     <input type="checkbox" id="permission-check">Set Permission True in Window.UpdateOptions
+    -->
     <button onclick="executeAPICall()">Execute</button>
     <br><br>
     <p><h3>API call response: </h3><span id="api-response" style="color: green"></span></p>

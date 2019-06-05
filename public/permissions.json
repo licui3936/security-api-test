@@ -14,18 +14,12 @@
         "permissions": {
           "System": {
             "downloadAsset": false,
-            "launchExternalProcess": false,
+            "launchExternalProcess": true,
             "readRegistryValue": false,
             "terminateExternalProcess": false
           }
         }
-      },
-      "default": {
-        "permissions": {
-          "System": {
-            "launchExternalProcess": true
-          }
-        }
       }
+
     }
   }

@@ -18,6 +18,11 @@
         "accelerator": {
             "zoom": true
         },
+        "api": {
+            "iframe": {
+                "crossOriginInjection": false
+            }
+        },        
         "cornerRounding": {
             "width": 20,
             "height": 20
@@ -27,7 +32,12 @@
         "aspectRatio": 2,
         "frame": true,
         "nonPersistent": false,
-        "resizable": true    
+        "resizable": true,
+        "permissions": {
+            "System": {
+                "launchExternalProcess": true
+            }
+        }         
     },
     "runtime": {
         "arguments": "--inspect=9222 --v=1",

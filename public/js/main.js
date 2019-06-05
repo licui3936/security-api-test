@@ -11,27 +11,31 @@ document.addEventListener("DOMContentLoaded", () => {
 //Once the DOM has loaded and the OpenFin API is ready
 function onMain() { 
   //fin.desktop.System.showDeveloperTools(uuid, uuid);
-  fin.desktop.System.getVersion(version => {
-    const ofVersion = document.querySelector("#of-version");
-    ofVersion.innerText = version;
-  });
+  const ofVersion = document.querySelector("#of-version");
+  if(ofVersion) {
+    fin.desktop.System.getVersion(version => {    
+      ofVersion.innerText = version;
+    });
+  }
 }
 
 function executeAPICall(){
   const apiOption = document.querySelector("#apiSelect").value;
   const apiResponse = document.querySelector("#api-response");
   const permissionChk = document.querySelector("#permission-check");
+
   if(apiOption === 'launchExternalProcess') {
       // update window option
-      const mainWindow = fin.desktop.Window.getCurrent();
-      mainWindow.updateOptions({
-        permissions: {
-          System: {
-            launchExternalProcess: permissionChk.checked
+      if(permissionChk) {
+        const mainWindow = fin.desktop.Window.getCurrent();
+        mainWindow.updateOptions({
+          permissions: {
+            System: {
+              launchExternalProcess: permissionChk.checked
+            }
           }
-        }
-      });
-
+        });
+      }
       // call API 
       fin.desktop.System.launchExternalProcess({
         path: "notepad",
@@ -39,10 +43,10 @@ function executeAPICall(){
         listener: function (result) {
             console.log('the exit code', result.exitCode);
         }
-    },  (payload) => {
-        apiResponse.innerText = 'Success:' + payload.uuid;
+    },  (payload) => {    
+        apiResponse.innerHTML = "<span style='color: green'>'Success:' " + payload.uuid + "</span>";
     }, (error) => {
-        apiResponse.innerText = 'Error:' + error;
+        apiResponse.innerHTML = "<span style='color: red'>'Error:' " + error + "</span>";
     });
   }
   else {
@@ -79,6 +83,26 @@ function createChildWindow() {
       }
     };
   }
+  fin.Window.create(winOption);
+}
+
+function createWindow() {
+  window.open('http://localhost:5566/child.html');
+}
+
+function createIframeWindow() {
+  const permissionValue = document.querySelector("#permissionSel").value === 'true' ? true : false;  
+  let winOption = {
+    name:'child' + Math.random(),
+    defaultWidth: 600,
+    defaultHeight: 600,
+    url: 'http://localhost:5566/iframe.html',
+    frame: true,
+    autoShow: true,
+    permissions: {
+      launchExternalProcess: permissionValue
+    }
+  };
   fin.Window.create(winOption);
 }
 

@@ -26,12 +26,22 @@
     <br><br>
     <p><h3>API call response: </h3><span id="api-response" style="color: green"></span></p>
     <br>
-    <h3>Launch Child App/Window with Options Object</h3>
+    <h3>Launch Openfin Child App/Window with Options Object</h3>
     <input type="radio" name="childPermission" value="inherited" checked>No Permission Passed In<br>
     <input type="radio" name="childPermission" value="passedIn">Pass in Permission: <select id="permissionSel"><option value="true">True</option><option value="false">False</option></select>
     <br><br>
     <button onclick="createChildApp()">Open Child App</button>&nbsp;&nbsp;&nbsp;&nbsp;<button onclick="createChildWindow()">Open Child Window</button>
     <br>
+    <h3>Launch Raw Window</h3>
+    <button onclick="createWindow()">Window.Open</button>
+    <a href="http://localhost:5566/child.html" target="_blank">Open a link with target blank</a>
+    <br>
+    <h3>Permission in IFrame</h3><button onclick="createIframeWindow()">Open a Child Window with Iframe In it</button>
+    <iframe src="http://localhost:5566/child.html" name="iframe_test" width="100%" allowfullscreen>
+      <p>Your browser does not support iframes.</p>
+    </iframe>
+      
+    <!--a href="http://localhost:5566/Child.html" target="iframe_a">Test Iframe</a-->
     <h3>Launch An App from manifest Url</h3>
     <select id="manifestSelect">
       <option value="0">no matched manifest url, permissions not specified in manifest file</option>      
