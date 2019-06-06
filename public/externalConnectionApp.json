@@ -1,0 +1,23 @@
+{
+    "devtools_port": 9090,
+    "licenseKey": "64605fac-add3-48a0-8710-64b38e96a2dd",
+    "startup_app": {
+        "name": "externalAppTest",
+        "url": "http://localhost:5566/child.html",
+        "uuid": "externalAppTest",
+        "icon": "http://localhost:5566/favicon.ico",
+        "defaultWidth": 800,
+        "defaultHeight": 600,
+        "autoShow": true,
+        "frame": true,
+        "permissions": {
+            "System": {
+				"launchExternalProcess": true
+			}
+        }
+    },
+    "runtime": {
+        "arguments": "--inspect=9222 --v=1",
+        "version": "canary"
+    }
+}

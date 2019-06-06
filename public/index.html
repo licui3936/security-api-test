@@ -14,6 +14,7 @@
     <p id="version-number-container">
       Current runtime version: <span id="of-version"></span>
     </p>
+    <!-- These are APIs in phase 1. But we only call launchExternalProcess for testing now. -->
     <h3>Secured APIs in Phase 1</h3>
     <select id="apiSelect">
       <option value="downloadAsset">downloadAsset</option>
@@ -21,32 +22,36 @@
       <option value="readRegistryValue">readRegistryValue</option>
       <option value="terminateExternalProcess">terminateExternalProcess</option>
     </select>
+    <!-- Test permission with window.UpdateOptions. It's currenlty not working. Need to address it later -->
     <input type="checkbox" id="permission-check">Set Permission True in Window.UpdateOptions
     <button onclick="executeAPICall()">Execute</button>
-    <br><br>
-    <p><h3>API call response: </h3><span id="api-response" style="color: green"></span></p>
     <br>
+    <h4>API call response: </h4><span id="api-response" style="color: green"></span>
+    <br>
+    <!-- Test permission in child window or child app -->
     <h3>Launch Openfin Child App/Window with Options Object</h3>
     <input type="radio" name="childPermission" value="inherited" checked>No Permission Passed In<br>
     <input type="radio" name="childPermission" value="passedIn">Pass in Permission: <select id="permissionSel"><option value="true">True</option><option value="false">False</option></select>
     <br><br>
     <button onclick="createChildApp()">Open Child App</button>&nbsp;&nbsp;&nbsp;&nbsp;<button onclick="createChildWindow()">Open Child Window</button>
     <br>
+    <!-- Test permission in raw window -->
     <h3>Launch Raw Window</h3>
     <button onclick="createWindow()">Window.Open</button>&nbsp;&nbsp;&nbsp;&nbsp;
     <a href="http://localhost:5566/child.html" target="_blank">Open a link with target blank</a>
     <br>
+    <!-- Test permission in iframe -->
     <h3>Permission in IFrame</h3><button onclick="createIframeWindow()">Open a Child Window with Iframe In it</button>
     <iframe src="http://localhost:5566/child.html" name="iframe_test" width="100%" height="250">
       <p>Your browser does not support iframes.</p>
     </iframe>
       
-    <!--a href="http://localhost:5566/Child.html" target="iframe_a">Test Iframe</a-->
+    <!-- Test permission in different manifest urls -->
     <h3>Launch An App from manifest Url</h3>
     <select id="manifestSelect">
-      <option value="0">no matched manifest url, permissions not specified in manifest file</option>      
-      <option value="1">no matched manifest url, permission true in manifest file</option>
-      <option value="2">no matched manifest url, permission false in manifest file</option>      
+      <option value="0">no matched manifest url, default settings, permissions not specified in manifest file</option>      
+      <option value="1">no matched manifest url, default settings, permission true in manifest file</option>
+      <option value="2">no matched manifest url, default settings, permission false in manifest file</option>      
       <option value="3">matched manifest url, permissions not specified in manifest file</option>
       <option value="4">matched manifest url, permissions set to true in manifest file</option>
       <option value="5">matched manifest url, permissions set to false in manifest file</option>
