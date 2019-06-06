@@ -23,7 +23,7 @@
       "default": {
         "permissions": {
           "System": {
-            "launchExternalProcess": false
+            "launchExternalProcess": true
           }
         }
       }    
