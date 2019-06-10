@@ -16,14 +16,19 @@
     </p>
     <!-- These are APIs in phase 1. But we only call launchExternalProcess for testing now. -->
     <h3>Secured APIs in Phase 1</h3>
-    <select id="apiSelect">
+    <select id="apiSelect" onchange="hideShowTextBoxes(value)">
       <option value="downloadAsset">downloadAsset</option>
       <option value="launchExternalProcess" selected>launchExternalProcess</option>
       <option value="readRegistryValue">readRegistryValue</option>
       <option value="terminateExternalProcess">terminateExternalProcess</option>
     </select>
     <!-- Test permission with window.UpdateOptions. It's currenlty not working. Need to address it later -->
-    <input type="checkbox" id="permission-check">Set Permission True in Window.UpdateOptions
+    <!--input type="checkbox" id="permission-check">Set Permission True in Window.UpdateOptions-->
+    <span id="hidenSpan" style="display: none">
+    rootKey: <input type="text" id="rootKey" value="HKEY_LOCAL_MACHINE">
+    subKey: <input type="text" id="subKey" value="HARDWARE\DESCRIPTION\System">
+    value name: <input type="text" id="valueName" value="BootArchitecture">
+    </span>
     <button onclick="executeAPICall()">Execute</button>
     <br>
     <h4>API call response: </h4><span id="api-response" style="color: green"></span>

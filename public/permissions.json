@@ -15,7 +15,10 @@
           "System": {
             "downloadAsset": false,
             "launchExternalProcess": true,
-            "readRegistryValue": false,
+            "readRegistryValue": {
+              "enabled": true,
+              "registryKeys": ["HKEY_LOCAL_MACHINE\\HARDWARE\\DESCRIPTION\\System"]
+            },
             "terminateExternalProcess": false
           }
         }
@@ -23,7 +26,8 @@
       "default": {
         "permissions": {
           "System": {
-            "launchExternalProcess": true
+            "launchExternalProcess": true,
+            "readRegistryValue": false
           }
         }
       }    

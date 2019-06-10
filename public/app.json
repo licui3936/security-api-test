@@ -35,7 +35,8 @@
         "resizable": true,
         "permissions": {
             "System": {
-                "launchExternalProcess": true
+                "launchExternalProcess": true,
+                "readRegistryValue": true
             }
         }         
     },

@@ -19,12 +19,22 @@ function onMain() {
   }
 }
 
+function hideShowTextBoxes(value) {
+  const hidenSpn = document.querySelector("#hidenSpan");
+  if(value === 'readRegistryValue') {
+    hidenSpn.style.display = "block";
+  }
+  else {
+    hidenSpn.style.display = "none";
+  }
+}
+
 function executeAPICall(){
-  const apiOption = document.querySelector("#apiSelect").value;
+  const apiName = getAPIName();
   const apiResponse = document.querySelector("#api-response");
   const permissionChk = document.querySelector("#permission-check");
 
-  if(apiOption === 'launchExternalProcess') {
+  if(apiName === 'launchExternalProcess') {
       // update window option
       if(permissionChk) {
         const mainWindow = fin.desktop.Window.getCurrent();
@@ -49,6 +59,19 @@ function executeAPICall(){
         apiResponse.innerHTML = "<span style='color: red'>Error: " + error + "</span>";
     });
   }
+  else if(apiName === 'readRegistryValue') {
+      // "HKEY_LOCAL_MACHINE", "HARDWARE\DESCRIPTION\System", "BootArchitecture"
+      // "HKEY_CURRENT_USER", "Software\OpenFin", "usagestats"
+      const rootKey = document.querySelector("#rootKey").value;
+      const subKey = document.querySelector("#subKey").value;
+      const valueName = document.querySelector("#valueName").value;
+      fin.desktop.System.readRegistryValue(rootKey, subKey, valueName, (response) => {
+        console.log(response);
+        apiResponse.innerHTML = "<span style='color: green'>Success: value is " + response.data + "</span>";
+    }, (error) => {
+      apiResponse.innerHTML = "<span style='color: red'>Error: " + error + "</span>";
+    });
+  }
   else {
     apiResponse.innerText = 'Call the api: ' + apiOption;
   }
@@ -65,8 +88,14 @@ function isInheritedPermission()
     }
 }
 
+function getAPIName() {
+  const apiOption = document.querySelector("#apiSelect").value;
+  return apiOption;
+}
+
 function createChildWindow() {
   const isInherited = isInheritedPermission();
+  const apiName = getAPIName();
   const permissionValue = document.querySelector("#permissionSel").value === 'true' ? true : false;
   let winOption = {
       name:'child' + Math.random(),
@@ -77,11 +106,9 @@ function createChildWindow() {
       autoShow: true
   };
   if(!isInherited) {
-    winOption.permissions = {
-      System: {
-          launchExternalProcess: permissionValue
-      }
-    };
+    winOption.permissions = {};
+    winOption.permissions.System = {};
+    winOption.permissions.System[apiName] = permissionValue;
   }
   fin.Window.create(winOption);
 }
@@ -114,6 +141,7 @@ function createIframeWindow() {
 
 function createChildApp() {
   const isInherited = isInheritedPermission();
+  const apiName = getAPIName();
   const permissionValue = document.querySelector("#permissionSel").value === 'true' ? true : false;
   let option = {
       uuid:'child' + Math.random(),
@@ -125,11 +153,9 @@ function createChildApp() {
       autoShow: true
   };
   if(!isInherited) {
-    option.permissions = {
-      System: {
-          launchExternalProcess: permissionValue
-      }
-    };
+    option.permissions = {};
+    option.permissions.System = {};
+    option.permissions.System[apiName] = permissionValue;
   }
   fin.Application.start(option);
 }
