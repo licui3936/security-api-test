@@ -82,7 +82,7 @@ function executeAPICall(){
       const valueName = document.querySelector("#valueName").value;
       fin.desktop.System.readRegistryValue(rootKey, subKey, valueName, (response) => {
         console.log(response);
-        apiResponse.innerHTML = "<span style='color: green'>Success: value is " + response.data + "</span>";
+        apiResponse.innerHTML = "<span style='color: green'>Success: data is " + response.data + "</span>";
     }, (error) => {
       apiResponse.innerHTML = "<span style='color: red'>Error: " + error + "</span>";
     });
