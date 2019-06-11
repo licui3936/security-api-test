@@ -12,7 +12,10 @@
         "frame": true,
         "permissions": {
             "System": {
-                "launchExternalProcess": false
+                "downloadAsset": false,
+                "launchExternalProcess": false,
+                "readRegistryValue": false,
+                "terminateExternalProcess": false               
             }
         }
     },
