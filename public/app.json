@@ -38,7 +38,7 @@
                 "launchExternalProcess": true,
                 "readRegistryValue": true
             }
-        }         
+        }
     },
     "runtime": {
         "arguments": "--inspect=9222 --v=1",
