@@ -1,12 +1,6 @@
 # Security API test application
 
-Test harness to test security policies for OpenFin APIs are defined in permissions.json.
-
-#### [Visual Studio code](https://code.visualstudio.com/) integration, thanks to @jcarter
-
-* Attach to debugger for in-editor break points, call stacks, and an interactive console
-* Hadouken configuration ( `app.json` ) smart completion based on available parameters
-* Hadouken API smart completions based on variable types and function definitions
+Test harness is to test security policies for OpenFin APIs are defined in permissions.json.
 
 ### How to use this:
 
