@@ -17,6 +17,21 @@ function onMain() {
       ofVersion.innerText = version;
     });
   }
+
+  // set selected item
+  const apiSelect = document.querySelector("#apiSelect");
+  const apiName = getUrlParam("apiName");
+  // update iframe src
+  updateIframeSrc(apiName);     
+  if(apiSelect && apiName) {
+    apiSelect.value = apiName;
+    // Selection is not allowed in chile window
+    if(window.location.href.indexOf('child') > -1) {
+      apiSelect.disabled = true;
+    }
+
+    hideShowTextBoxes(apiName);
+  }
 }
 
 function hideShowTextBoxes(value) {
@@ -93,7 +108,7 @@ function getAPIName() {
   return apiOption;
 }
 
-function createChildWindow() {
+function _createChildWindow(url) {
   const isInherited = isInheritedPermission();
   const apiName = getAPIName();
   const permissionValue = document.querySelector("#permissionSel").value === 'true' ? true : false;
@@ -101,7 +116,7 @@ function createChildWindow() {
       name:'child' + Math.random(),
       defaultWidth: 600,
       defaultHeight: 600,
-      url: 'http://localhost:5566/child.html',
+      url: url +'?apiName=' + apiName,
       frame: true,
       autoShow: true
   };
@@ -113,30 +128,17 @@ function createChildWindow() {
   fin.Window.create(winOption);
 }
 
+function createChildWindow() {
+  _createChildWindow('http://localhost:5566/child.html');
+}
+
 function createWindow() {
-  window.open('http://localhost:5566/child.html');
+  const apiName = getAPIName();
+  window.open('http://localhost:5566/child.html?apiName=' + apiName);
 }
 
 function createIframeWindow() {
-  const isInherited = isInheritedPermission();
-  const permissionValue = document.querySelector("#permissionSel").value === 'true' ? true : false;  
-  let winOption = {
-    name:'child' + Math.random(),
-    defaultWidth: 600,
-    defaultHeight: 600,
-    url: 'http://localhost:5566/iframe.html',
-    frame: true,
-    autoShow: true
-  };
-
-  if(!isInherited) {
-    winOption.permissions = {
-      System: {
-          launchExternalProcess: permissionValue
-      }
-    };
-  }  
-  fin.Window.create(winOption);
+  _createChildWindow('http://localhost:5566/iframe.html');
 }
 
 function createChildApp() {
@@ -148,7 +150,7 @@ function createChildApp() {
       name:'child',
       defaultWidth: 600,
       defaultHeight: 600,
-      url: 'http://localhost:5566/child.html',
+      url: 'http://localhost:5566/child.html?apiName=' + apiName,
       frame: true,
       autoShow: true
   };
@@ -181,3 +183,26 @@ function createAppFromManifest() {
     fin.Application.startFromManifest('http://localhost:5566/matched/appMatchPermissionFalse.json').then(app => console.log('App is running')).catch(err => console.log(err));
   }    
 }
+
+function getUrlParam(param) {
+  const pageUrl = window.location.search.substring(1);
+  const urlVariables = pageUrl.split('&');
+  for (let i = 0; i< urlVariables.length; i++) {
+    const paramNameValue = urlVariables[i].split('=');
+    if(paramNameValue[0] === param) {
+      return paramNameValue[1];
+    }
+  }
+}
+
+function updateHref(aLink) {
+  aLink.href = "http://localhost:5566/child.html?apiName=" + getAPIName();
+}
+
+function updateIframeSrc(apiName) {
+  const iframeTest = document.querySelector("#iframe_test");
+  if(iframeTest) {
+    iframeTest.setAttribute('src', "http://localhost:5566/child.html?apiName=" + apiName);
+  }
+}
+ 

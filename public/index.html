@@ -6,6 +6,7 @@
   <title>OpenFin Security API Test</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="js/main.js"></script>
 </head>
 
 <body>
@@ -31,7 +32,7 @@
     </span>
     <button onclick="executeAPICall()">Execute</button>
     <br>
-    <h4>API call response: </h4><span id="api-response" style="color: green"></span>
+    <h4>API call response in main window: </h4><span id="api-response" style="color: green"></span>
     <br>
     <!-- Test permission in child window or child app -->
     <h3>Launch Openfin Child App/Window with Options Object</h3>
@@ -40,10 +41,10 @@
     <br><br>
     <button onclick="createChildApp()">Open Child App</button>&nbsp;&nbsp;&nbsp;&nbsp;<button onclick="createChildWindow()">Open Child Window</button>
     <br>
-    <!-- Test permission in raw window -->
+    <!-- Test permission in raw window. It should always be denied in raw window. -->
     <h3>Launch Raw Window</h3>
     <button onclick="createWindow()">Window.Open</button>&nbsp;&nbsp;&nbsp;&nbsp;
-    <a href="http://localhost:5566/child.html" target="_blank">Open a link with target blank</a>
+    <a href="http://localhost:5566/child.html" onclick="updateHref(this);" target="_blank">Open a link with target blank</a>    
     <br>
     <!-- Test permission in iframe -->
     <h3>Permission in IFrame</h3><button onclick="createIframeWindow()">Open a Child Window with Iframe In it</button>
@@ -63,6 +64,5 @@
     </select>    
     <button onclick="createAppFromManifest()">Launch</button>
   </div>  
-  <script src="js/main.js"></script>
 </body>
 </html>

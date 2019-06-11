@@ -2,14 +2,32 @@ const { connect } = require("hadouken-js-adapter");
 
 async function launchApp() {
     // connecto to the current running runtime
+    // permissions option is currently NOT supported
     const fin  = await connect({
         uuid: "external-connection-test",
         address: 'ws://localhost:9696',
-        nonPersistent: true
+        nonPersistent: true,
+        permissions: {
+            System: {
+              launchExternalProcess: false
+            }
+        },
+        runtime: {
+            arguments: "--inspect=9222 --v=1"
+        }
     });
 
     const version = await fin.System.getVersion();
     console.log("Connected to Hadouken version", version);
+
+    // test api in node adapter
+    await fin.System.launchExternalProcess({
+        path: "notepad",
+        arguments: "",
+        listener: function (result) {
+            console.log('the exit code', result.exitCode);
+        }
+    }); 
 
     // Test permission specified in options object. You can change below permission value and see the result.
     await fin.Application.start({
@@ -22,7 +40,7 @@ async function launchApp() {
             System: {
               launchExternalProcess: true
             }
-        }        
+        }
     });
 }
 
