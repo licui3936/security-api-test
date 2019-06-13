@@ -1,19 +1,13 @@
 //event listeners.
 document.addEventListener("DOMContentLoaded", () => {
-  if (typeof fin != "undefined") {
-    fin.desktop.main(onMain);
-  } else {
-    ofVersion.innerText =
-      "OpenFin is not available - you are probably running in a browser.";
-  }
+  onMain();
 });
 
 //Once the DOM has loaded and the OpenFin API is ready
 function onMain() { 
-  //fin.desktop.System.showDeveloperTools(uuid, uuid);
   const ofVersion = document.querySelector("#of-version");
   if(ofVersion) {
-    fin.desktop.System.getVersion(version => {    
+    fin.System.getVersion().then(version => {    
       ofVersion.innerText = version;
     });
   }
@@ -50,7 +44,8 @@ function executeAPICall(){
   const permissionChk = document.querySelector("#permission-check");
 
   if(apiName === 'launchExternalProcess') {
-      // update window option
+      // update window option,permission is not working with updateOptions
+      /*
       if(permissionChk) {
         const mainWindow = fin.desktop.Window.getCurrent();
         mainWindow.updateOptions({
@@ -60,19 +55,16 @@ function executeAPICall(){
             }
           }
         });
-      }
+      }*/
       // call API 
-      fin.desktop.System.launchExternalProcess({
+      fin.System.launchExternalProcess({
         path: "notepad",
         arguments: "",
         listener: function (result) {
-            console.log('the exit code', result.exitCode);
-        }
-    },  (payload) => {    
-        apiResponse.innerHTML = "<span style='color: green'>Success: " + payload.uuid + "</span>";
-    }, (error) => {
-        apiResponse.innerHTML = "<span style='color: red'>Error: " + error + "</span>";
-    });
+          console.log('the exit code', result.exitCode);
+        }        
+      }).then(payload => apiResponse.innerHTML = "<span style='color: green'>Success: " + payload.uuid + "</span>")
+      .catch(error => apiResponse.innerHTML = "<span style='color: red'>Error: " + error + "</span>");
   }
   else if(apiName === 'readRegistryValue') {
       // "HKEY_LOCAL_MACHINE", "HARDWARE\DESCRIPTION\System", "BootArchitecture"
@@ -80,15 +72,13 @@ function executeAPICall(){
       const rootKey = document.querySelector("#rootKey").value;
       const subKey = document.querySelector("#subKey").value;
       const valueName = document.querySelector("#valueName").value;
-      fin.desktop.System.readRegistryValue(rootKey, subKey, valueName, (response) => {
+      fin.System.readRegistryValue(rootKey, subKey, valueName).then(response=> {
         console.log(response);
-        apiResponse.innerHTML = "<span style='color: green'>Success: data is " + response.data + "</span>";
-    }, (error) => {
-      apiResponse.innerHTML = "<span style='color: red'>Error: " + error + "</span>";
-    });
+        apiResponse.innerHTML = "<span style='color: green'>Success: data is " + response.data + "</span>";    
+      }).catch(error => apiResponse.innerHTML = "<span style='color: red'>Error: " + error + "</span>");
   }
   else {
-    apiResponse.innerText = 'Call the api: ' + apiOption;
+    apiResponse.innerText = '' + apiName + ' is currently not testable. ';
   }
 }
 
