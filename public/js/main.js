@@ -26,7 +26,7 @@ function onMain() {
 
   // set selected item
   const apiSelect = document.querySelector("#apiSelect");
-  const apiName = getUrlParam("apiName");
+  const apiName = getUrlParam(window, "apiName");
 
   // update iframe src
   updateIframeSrc(apiName);     
@@ -44,10 +44,10 @@ function onMain() {
 // expected permission map
 // key: DOS_manifest_options
 const expectedPermissionMap = new Map(Object.entries({
-  true: 'nack',
+  true_none: 'nack',
   true_true: 'ack',
   true_false: 'nack',
-  false: 'nack',
+  false_none: 'nack',
   false_true: 'nack',
   false_false: 'nack',
   none_none: 'nack',
@@ -81,8 +81,7 @@ function getPermissionMap() {
         const applicationSettingStr = content.substring(startIndex, endTopicIndex);
         //console.log(applicationSettingStr) ;
         const applicationSetting = JSON.parse(applicationSettingStr);
-        //const DOSPermissions = applicationSetting['MyPolicies']['permissions'];
-        //console.log(DOSPermissions);
+        //console.log(applicationSetting);
         permissionMap['DOS'] = applicationSetting;
       }
     }
@@ -137,24 +136,35 @@ function getDOSAndManifestPermission() {
 
 function getExpectedResult() {
   let expected;
-  //check if applicationSettings is empty
-  const DOSPermissions = permissionMap['DOS'];
-  if( typeof DOSPermissions === 'object' && Object.keys(DOSPermissions).length === 0) {
+  // check if it's raw window
+  const isRawWindow = getUrlParam(window, "isRawWindow");
+  if(isRawWindow) {
     expected = 'nack';
   }
   else {
-    let permissionKey = getDOSAndManifestPermission();
-    if(window.location.href.indexOf('child') > -1) {
-      const permissionValue = getUrlParam("permission");
-      if(!permissionValue) {
-        permissionKey += '_none';
-      }
-      else {
-        permissionKey += '_' + permissionValue;
-      }
+    //check if applicationSettings object is empty
+    const DOSPermissions = permissionMap['DOS'];
+    if( typeof DOSPermissions === 'object' && Object.keys(DOSPermissions).length === 0) {
+      expected = 'nack';
     }
-    expected = expectedPermissionMap.get(permissionKey);
-    console.log('key: ' + permissionKey + ' expected:' + expected);
+    else {
+      let permissionKey = getDOSAndManifestPermission(); 
+      const isIframe = getUrlParam(window, "isIframe");
+      if(!isIframe && window.location.href.indexOf('child') > -1) { // child window
+        let permissionValue = getUrlParam(window, "permission");
+        if(permissionValue) { // child window
+          permissionKey += '_' + permissionValue;
+        }
+        else { // iframe in child window
+          if(parent.location.href.indexOf('iframe') > 0) {
+            permissionValue = getUrlParam(parent, "permission");
+            permissionKey += '_' + permissionValue;
+          }
+        }
+      }
+      expected = expectedPermissionMap.get(permissionKey);
+      console.log('key: ' + permissionKey + ' expected:' + expected);
+    }
   }
   return expected;
 }
@@ -253,13 +263,17 @@ function _createChildWindow(url) {
       defaultHeight: 600,
       url: url +'?apiName=' + apiName,
       frame: true,
-      autoShow: true
+      autoShow: true,
+      alwaysOnTop: true
   };
   if(!isInherited) {
     winOption.url += '&permission=' + permissionValue;
     winOption.permissions = {};
     winOption.permissions.System = {};
     winOption.permissions.System[apiName] = permissionValue;
+  }
+  else {
+    winOption.url += '&permission=none';
   }
   fin.Window.create(winOption);
 }
@@ -270,7 +284,7 @@ function createChildWindow() {
 
 function createWindow() {
   const apiName = getAPIName();
-  window.open(childUrl + '?apiName=' + apiName);
+  window.open(childUrl + '?isRawWindow=true&apiName=' + apiName);
 }
 
 function createIframeWindow() {
@@ -291,10 +305,14 @@ function createChildApp() {
       autoShow: true
   };
   if(!isInherited) {
+    option.url += '&permission=' + permissionValue;    
     option.permissions = {};
     option.permissions.System = {};
     option.permissions.System[apiName] = permissionValue;
   }
+  else {
+    option.url += '&permission=none';
+  }  
   fin.Application.start(option);
 }
 
@@ -320,8 +338,8 @@ function createAppFromManifest() {
   }    
 }
 
-function getUrlParam(param) {
-  const pageUrl = window.location.search.substring(1);
+function getUrlParam(win, param) {
+  const pageUrl = win.location.search.substring(1);
   const urlVariables = pageUrl.split('&');
   for (let i = 0; i< urlVariables.length; i++) {
     const paramNameValue = urlVariables[i].split('=');
@@ -332,7 +350,7 @@ function getUrlParam(param) {
 }
 
 function updateHref(aLink) {
-  aLink.href = childUrl + "?apiName=" + getAPIName();
+  aLink.href = childUrl + "?isRawWindow&apiName=" + getAPIName();
 }
 
 function updateIframeSrc(apiName) {
