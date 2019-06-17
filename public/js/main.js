@@ -3,8 +3,14 @@ document.addEventListener("DOMContentLoaded", () => {
   onMain();
 });
 
+const childUrl = 'http://localhost:5566/child.html';
+const CONFIG_URL_WILDCARD = 'default';
+let permissionMap;
+let isApplicationSettingsExist = false;
+const showExpectedResult = true;
+
 //Once the DOM has loaded and the OpenFin API is ready
-function onMain() { 
+function onMain() {
   const ofVersion = document.querySelector("#of-version");
   if(ofVersion) {
     fin.System.getVersion().then(version => {    
@@ -12,9 +18,16 @@ function onMain() {
     });
   }
 
+  //get permission
+  if(showExpectedResult && !permissionMap) {
+    getPermissionMap();
+    console.log(permissionMap);
+  }
+
   // set selected item
   const apiSelect = document.querySelector("#apiSelect");
   const apiName = getUrlParam("apiName");
+
   // update iframe src
   updateIframeSrc(apiName);     
   if(apiSelect && apiName) {
@@ -28,6 +41,67 @@ function onMain() {
   }
 }
 
+// expected permission map
+// key: DOS_manifest_options
+const expectedPermissionMap = new Map(Object.entries({
+  true: 'nack',
+  true_true: 'ack',
+  true_false: 'nack',
+  false: 'nack',
+  false_true: 'nack',
+  false_false: 'nack',
+  none_none: 'nack',
+  none_true: 'ack',
+  none_false: 'nack',
+  none_none_none: 'nack',
+  none_none_true: 'nack',
+  none_none_false: 'nack',
+  none_true_none: 'nack',
+  none_true_true: 'ack',
+  none_true_false: 'nack',
+  none_false_none: 'nack',
+  none_false_true: 'nack',
+  none_false_false: 'nack'
+}));
+
+function getPermissionMap() {
+  permissionMap = {};
+  fin.desktop.System.getLog('debug.log', content => {
+    // check if applicationSettings exists
+    const appSettingMessage = '"applicationSettingsExists":true';
+    isApplicationSettingsExist = content.indexOf(appSettingMessage) > -1? true : false;
+
+    // find permission in desktop owner settings
+    if(isApplicationSettingsExist) {
+      const DOSMessage = '"desktopOwnerFileExists":true';
+      const DOSIndex = content.indexOf(DOSMessage);
+      if(DOSIndex > -1) {
+        const startIndex = DOSIndex + DOSMessage.length + 11;
+        const endTopicIndex = content.indexOf(',"success":true');
+        const applicationSettingStr = content.substring(startIndex, endTopicIndex);
+        //console.log(applicationSettingStr) ;
+        const applicationSetting = JSON.parse(applicationSettingStr);
+        //const DOSPermissions = applicationSetting['MyPolicies']['permissions'];
+        //console.log(DOSPermissions);
+        permissionMap['DOS'] = applicationSetting;
+      }
+    }
+    // find permission in manifest file app.json
+    const manifestMessage = '"startup_app": ';
+    const index = content.indexOf(manifestMessage);
+    if(index > -1) {
+      const startIndex = index + manifestMessage.length;
+      const endTopicIndex = content.indexOf('"runtime": {');
+      const startupStr = content.substring(startIndex, endTopicIndex - 6);
+      //console.log(startupStr) ;
+      const startup = JSON.parse(startupStr);
+      const manifestPermissions = startup['permissions'];
+      //console.log(manifestPermissions);
+      permissionMap['manifest'] = manifestPermissions;
+    }    
+  });
+}
+
 function hideShowTextBoxes(value) {
   const hidenSpn = document.querySelector("#hidenSpan");
   if(value === 'readRegistryValue') {
@@ -38,24 +112,77 @@ function hideShowTextBoxes(value) {
   }
 }
 
+function getDOSAndManifestPermission() {
+  const apiName = getAPIName();
+  let DOSAPIPermission;
+  if(!isApplicationSettingsExist) {
+    DOSAPIPermission = 'none';
+  }
+  else {
+    const DOSAPIPermissionObj = searchPermissionByConfigUrl('http://localhost:5566/app.json');
+    DOSAPIPermission = typeof permissionMap['DOS'].System[apiName] === 'object' ? permissionMap['DOS'].System[apiName]['enabled'] : permissionMap['DOS'].System[apiName];
+  }
+
+  // get permissiom in manifest file
+  let manifestPermission;
+  const permissiomObj = permissionMap['manifest'];
+  if(!permissiomObj) {
+    manifestPermission = 'none';
+  }
+  else {
+    manifestPermission = typeof permissiomObj.System[apiName] === 'object' ? permissiomObj.System[apiName]['enabled'] : permissiomObj.System[apiName];
+  }
+  return DOSAPIPermission + '_' + manifestPermission;
+}
+
+function getExpectedResult() {
+  let expected;
+  //check if applicationSettings is empty
+  const DOSPermissions = permissionMap['DOS'];
+  if( typeof DOSPermissions === 'object' && Object.keys(DOSPermissions).length === 0) {
+    expected = 'nack';
+  }
+  else {
+    let permissionKey = getDOSAndManifestPermission();
+    if(window.location.href.indexOf('child') > -1) {
+      const permissionValue = getUrlParam("permission");
+      if(!permissionValue) {
+        permissionKey += '_none';
+      }
+      else {
+        permissionKey += '_' + permissionValue;
+      }
+    }
+    expected = expectedPermissionMap.get(permissionKey);
+    console.log('key: ' + permissionKey + ' expected:' + expected);
+  }
+  return expected;
+}
+
 function executeAPICall(){
   const apiName = getAPIName();
   const apiResponse = document.querySelector("#api-response");
-  const permissionChk = document.querySelector("#permission-check");
+  let expectedHtml = "";
+  if(showExpectedResult) {
+    let expected = getExpectedResult();
+    expectedHtml = showExpectedResult? ("<span style='color: purple'>Expected: " + expected + "</span><br>") : expectedHtml;
+  }
 
+  // update window option,permission is not working with updateOptions
+  /*
+  const permissionChk = document.querySelector("#permission-check");
+  if(permissionChk) {
+    const mainWindow = fin.desktop.Window.getCurrent();
+    mainWindow.updateOptions({
+      permissions: {
+        System: {
+          launchExternalProcess: permissionChk.checked
+        }
+      }
+    });
+  }
+  */
   if(apiName === 'launchExternalProcess') {
-      // update window option,permission is not working with updateOptions
-      /*
-      if(permissionChk) {
-        const mainWindow = fin.desktop.Window.getCurrent();
-        mainWindow.updateOptions({
-          permissions: {
-            System: {
-              launchExternalProcess: permissionChk.checked
-            }
-          }
-        });
-      }*/
       // call API 
       fin.System.launchExternalProcess({
         path: "notepad",
@@ -63,8 +190,8 @@ function executeAPICall(){
         listener: function (result) {
           console.log('the exit code', result.exitCode);
         }        
-      }).then(payload => apiResponse.innerHTML = "<span style='color: green'>Success: " + payload.uuid + "</span>")
-      .catch(error => apiResponse.innerHTML = "<span style='color: red'>Error: " + error + "</span>");
+      }).then(payload => apiResponse.innerHTML = expectedHtml + "<span style='color: green'>Success: " + payload.uuid + "</span>")
+      .catch(error => apiResponse.innerHTML = expectedHtml + "<span style='color: red'>Error: " + error + "</span>");
   }
   else if(apiName === 'readRegistryValue') {
       // "HKEY_LOCAL_MACHINE", "HARDWARE\DESCRIPTION\System", "BootArchitecture"
@@ -74,11 +201,29 @@ function executeAPICall(){
       const valueName = document.querySelector("#valueName").value;
       fin.System.readRegistryValue(rootKey, subKey, valueName).then(response=> {
         console.log(response);
-        apiResponse.innerHTML = "<span style='color: green'>Success: data is " + response.data + "</span>";    
-      }).catch(error => apiResponse.innerHTML = "<span style='color: red'>Error: " + error + "</span>");
+        apiResponse.innerHTML =  expectedHtml + "<span style='color: green'>Success: data is " + response.data + "</span>";    
+      }).catch(error => apiResponse.innerHTML = expectedHtml + "<span style='color: red'>Error: " + error + "</span>");
   }
   else {
     apiResponse.innerText = '' + apiName + ' is currently not testable. ';
+  }
+}
+
+function searchPermissionByConfigUrl(url) {
+  const apiPermissions = permissionMap['DOS'];
+  if (apiPermissions) {
+      for (const permissionName of Object.keys(apiPermissions)) {
+          const permission = apiPermissions[permissionName];
+          if (url === CONFIG_URL_WILDCARD && url === permissionName) {
+              return permission;
+          } else if (Array.isArray(permission.urls) && permission.urls.indexOf(url) > -1) { // need to do more
+              return permission;
+          } /*else if (electronApp.matchesURL(url,  [policyName])) {
+              return policy;
+          }*/
+      }
+  } else {
+      console.log('missing API permissions');
   }
 }
 
@@ -111,6 +256,7 @@ function _createChildWindow(url) {
       autoShow: true
   };
   if(!isInherited) {
+    winOption.url += '&permission=' + permissionValue;
     winOption.permissions = {};
     winOption.permissions.System = {};
     winOption.permissions.System[apiName] = permissionValue;
@@ -119,12 +265,12 @@ function _createChildWindow(url) {
 }
 
 function createChildWindow() {
-  _createChildWindow('http://localhost:5566/child.html');
+  _createChildWindow(childUrl);
 }
 
 function createWindow() {
   const apiName = getAPIName();
-  window.open('http://localhost:5566/child.html?apiName=' + apiName);
+  window.open(childUrl + '?apiName=' + apiName);
 }
 
 function createIframeWindow() {
@@ -140,7 +286,7 @@ function createChildApp() {
       name:'child',
       defaultWidth: 600,
       defaultHeight: 600,
-      url: 'http://localhost:5566/child.html?apiName=' + apiName,
+      url: childUrl + '?apiName=' + apiName,
       frame: true,
       autoShow: true
   };
@@ -186,13 +332,13 @@ function getUrlParam(param) {
 }
 
 function updateHref(aLink) {
-  aLink.href = "http://localhost:5566/child.html?apiName=" + getAPIName();
+  aLink.href = childUrl + "?apiName=" + getAPIName();
 }
 
 function updateIframeSrc(apiName) {
   const iframeTest = document.querySelector("#iframe_test");
   if(iframeTest) {
-    iframeTest.setAttribute('src', "http://localhost:5566/child.html?apiName=" + apiName);
+    iframeTest.setAttribute('src', childUrl + "?apiName=" + apiName);
   }
 }
  
