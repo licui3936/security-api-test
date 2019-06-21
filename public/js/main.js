@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 const childUrl = 'http://localhost:5566/child.html';
-const CONFIG_URL_WILDCARD = 'default';
 let permissionMap;
 let isApplicationSettingsExist = false;
 const showExpectedResult = true;
@@ -42,17 +41,17 @@ function onMain() {
 }
 
 // expected permission map
-// key: DOS_manifest_options
+// key: DOS_manifest_windowOptions
 const expectedPermissionMap = new Map(Object.entries({
+  none_none: 'nack',
+  none_true: 'ack',
+  none_false: 'nack',
   true_none: 'nack',
   true_true: 'ack',
   true_false: 'nack',
   false_none: 'nack',
   false_true: 'nack',
-  false_false: 'nack',
-  none_none: 'nack',
-  none_true: 'ack',
-  none_false: 'nack',
+  false_false: 'nack',  
   none_none_none: 'nack',
   none_none_true: 'nack',
   none_none_false: 'nack',
@@ -61,7 +60,25 @@ const expectedPermissionMap = new Map(Object.entries({
   none_true_false: 'nack',
   none_false_none: 'nack',
   none_false_true: 'nack',
-  none_false_false: 'nack'
+  none_false_false: 'nack',
+  true_none_none: 'nack',
+  true_none_true: 'nack',
+  true_none_false: 'nack',
+  true_true_none: 'nack',
+  true_true_true: 'ack',
+  true_true_false: 'nack',
+  true_false_none: 'nack',
+  true_false_true: 'nack',
+  true_false_false: 'nack',
+  false_none_none: 'nack',
+  false_none_true: 'nack',
+  false_none_false: 'nack',
+  false_true_none: 'nack',
+  false_true_true: 'nack',
+  false_true_false: 'nack',
+  false_false_none: 'nack',
+  false_false_true: 'nack',
+  false_false_false: 'nack'
 }));
 
 function getPermissionMap() {
@@ -119,7 +136,10 @@ function getDOSAndManifestPermission() {
   }
   else {
     const DOSAPIPermissionObj = searchPermissionByConfigUrl('http://localhost:5566/app.json');
-    DOSAPIPermission = typeof permissionMap['DOS'].System[apiName] === 'object' ? permissionMap['DOS'].System[apiName]['enabled'] : permissionMap['DOS'].System[apiName];
+    if(DOSAPIPermissionObj && Object.keys(DOSAPIPermissionObj).length === 0) {// no match, no default
+      return '';
+    }
+    DOSAPIPermission = typeof DOSAPIPermissionObj.System[apiName] === 'object' ? DOSAPIPermissionObj.System[apiName]['enabled'] : DOSAPIPermissionObj.System[apiName];
   }
 
   // get permissiom in manifest file
@@ -136,34 +156,39 @@ function getDOSAndManifestPermission() {
 
 function getExpectedResult() {
   let expected;
-  // check if it's raw window
+  // If it's raw window, always nack 
   const isRawWindow = getUrlParam(window, "isRawWindow");
   if(isRawWindow) {
     expected = 'nack';
   }
   else {
-    //check if applicationSettings object is empty
+    //If applicationSettings object is empty, always nack
     const DOSPermissions = permissionMap['DOS'];
-    if( typeof DOSPermissions === 'object' && Object.keys(DOSPermissions).length === 0) {
+    if(typeof DOSPermissions === 'object' && Object.keys(DOSPermissions).length === 0) {
       expected = 'nack';
     }
     else {
-      let permissionKey = getDOSAndManifestPermission(); 
-      const isIframe = getUrlParam(window, "isIframe");
-      if(!isIframe && window.location.href.indexOf('child') > -1) { // child window
-        let permissionValue = getUrlParam(window, "permission");
-        if(permissionValue) { // child window
-          permissionKey += '_' + permissionValue;
-        }
-        else { // iframe in child window
-          if(parent.location.href.indexOf('iframe') > 0) {
-            permissionValue = getUrlParam(parent, "permission");
+      let permissionKey = getDOSAndManifestPermission();
+      if(permissionKey === '') { // url no match and no default
+        expected = 'nack';        
+      }
+      else { // handle cases: no desktopOwnerSettings, no applicationSettings, url matched, url no match and has default,
+        const isIframe = getUrlParam(window, "isIframe");
+        if(!isIframe && window.location.href.indexOf('child') > -1) { // child window
+          let permissionValue = getUrlParam(window, "permission");
+          if(permissionValue) { // child window
             permissionKey += '_' + permissionValue;
           }
+          else { // iframe in child window
+            if(parent.location.href.indexOf('iframe') > 0) {
+              permissionValue = getUrlParam(parent, "permission");
+              permissionKey += '_' + permissionValue;
+            }
+          }
         }
+        expected = expectedPermissionMap.get(permissionKey);
+        console.log('key: ' + permissionKey + ' expected:' + expected);
       }
-      expected = expectedPermissionMap.get(permissionKey);
-      console.log('key: ' + permissionKey + ' expected:' + expected);
     }
   }
   return expected;
@@ -219,18 +244,35 @@ function executeAPICall(){
   }
 }
 
+function hasDefaultPermissions() {
+  const apiPermissions = permissionMap['DOS'];
+  return 'default' in apiPermissions;
+}
+
 function searchPermissionByConfigUrl(url) {
   const apiPermissions = permissionMap['DOS'];
+  let defaultPermissions;
+  let isFound = false;
   if (apiPermissions) {
       for (const permissionName of Object.keys(apiPermissions)) {
-          const permission = apiPermissions[permissionName];
-          if (url === CONFIG_URL_WILDCARD && url === permissionName) {
-              return permission;
-          } else if (Array.isArray(permission.urls) && permission.urls.indexOf(url) > -1) { // need to do more
-              return permission;
+          const permissionObj = apiPermissions[permissionName];
+          if(permissionName.toLowerCase() === 'default') {
+            defaultPermissions = permissionObj['permissions'];
+          }
+          if (Array.isArray(permissionObj.urls) && permissionObj.urls.indexOf(url) > -1) { // need to do more
+              isFound = true;
+              return permissionObj['permissions'];
           } /*else if (electronApp.matchesURL(url,  [policyName])) {
               return policy;
           }*/
+      }
+      if(!isFound) {
+        if(defaultPermissions) {
+          return defaultPermissions;
+        }
+        else { // no match, no default
+          return {};
+        }
       }
   } else {
       console.log('missing API permissions');
