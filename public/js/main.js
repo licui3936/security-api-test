@@ -41,7 +41,7 @@ function onMain() {
 }
 
 // expected permission map
-// key: DOS_manifest_windowOptions
+// key format: DOS_manifest_windowOptions
 const expectedPermissionMap = new Map(Object.entries({
   none_none: 'NACK',
   none_true: 'ACK',
@@ -85,20 +85,18 @@ function getPermissionMap() {
   permissionMap = {};
   fin.desktop.System.getLog('debug.log', content => {
     // check if applicationSettings exists
-    const appSettingMessage = '"applicationSettingsExists":true';
-    isApplicationSettingsExist = content.indexOf(appSettingMessage) > -1? true : false;
+    isApplicationSettingsExist = /"applicationSettingsExists":true/.test(content);
+    console.log('applicationSettings exists: ' + isApplicationSettingsExist);
 
     // find permission in desktop owner settings
     if(isApplicationSettingsExist) {
-      const DOSMessage = '"desktopOwnerFileExists":true';
+      const DOSMessage = '"desktopOwnerFileExists":true,"payload":';
       const DOSIndex = content.indexOf(DOSMessage);
       if(DOSIndex > -1) {
-        const startIndex = DOSIndex + DOSMessage.length + 11;
+        const startIndex = DOSIndex + DOSMessage.length;
         const endTopicIndex = content.indexOf(',"success":true');
         const applicationSettingStr = content.substring(startIndex, endTopicIndex);
-        //console.log(applicationSettingStr) ;
         const applicationSetting = JSON.parse(applicationSettingStr);
-        //console.log(applicationSetting);
         permissionMap['DOS'] = applicationSetting;
       }
     }
@@ -109,10 +107,8 @@ function getPermissionMap() {
       const startIndex = index + manifestMessage.length;
       const endTopicIndex = content.indexOf('"runtime": {');
       const startupStr = content.substring(startIndex, endTopicIndex - 6);
-      //console.log(startupStr) ;
       const startup = JSON.parse(startupStr);
       const manifestPermissions = startup['permissions'];
-      //console.log(manifestPermissions);
       permissionMap['manifest'] = manifestPermissions;
     }    
   });
@@ -194,6 +190,11 @@ function getExpectedResult() {
   return expected;
 }
 
+function getResponseHtml(responseText, isError) {
+  const colorPart = isError? "red'>Error: " : "#0b6623'>Success: ";
+  return "<span style='color:" + colorPart + responseText + "</span>";
+}
+
 function executeAPICall(){
   const apiName = getAPIName();
   const apiResponse = document.querySelector("#api-response");
@@ -225,8 +226,8 @@ function executeAPICall(){
         listener: function (result) {
           console.log('the exit code', result.exitCode);
         }        
-      }).then(payload => apiResponse.innerHTML = "<span style='color: #0b6623'>Success: " + payload.uuid + "</span>" + expectedHtml)
-      .catch(error => apiResponse.innerHTML = "<span style='color: red'>Error: " + error + "</span>" + expectedHtml);
+      }).then(payload => apiResponse.innerHTML = getResponseHtml(payload.uuid, false) + expectedHtml)
+      .catch(error => apiResponse.innerHTML = getResponseHtml(error, true) + expectedHtml);
   }
   else if(apiName === 'readRegistryValue') {
       // "HKEY_LOCAL_MACHINE", "HARDWARE\DESCRIPTION\System", "BootArchitecture"
@@ -236,8 +237,8 @@ function executeAPICall(){
       const valueName = document.querySelector("#valueName").value;
       fin.System.readRegistryValue(rootKey, subKey, valueName).then(response=> {
         console.log(response);
-        apiResponse.innerHTML = "<span style='color: #0b6623'>Success: data is " + response.data + "</span>" + expectedHtml;    
-      }).catch(error => apiResponse.innerHTML = "<span style='color: red'>Error: " + error + "</span>" + expectedHtml);
+        apiResponse.innerHTML = getResponseHtml("data is " + response.data, false) + expectedHtml;    
+      }).catch(error => apiResponse.innerHTML = getResponseHtml(error, true) + expectedHtml);
   }
   else {
     apiResponse.innerText = '' + apiName + ' is currently not testable. ';
@@ -299,7 +300,7 @@ function createOptions(url, isChildApp) {
   const isInherited = isInheritedPermission();
   const apiName = getAPIName();
   const permissionValue = document.querySelector("#permissionSel").value === 'true' ? true : false;
-  let winOption = {
+  let options = {
       defaultWidth: 600,
       defaultHeight: 600,
       url: url +'?apiName=' + apiName,
@@ -308,22 +309,22 @@ function createOptions(url, isChildApp) {
       alwaysOnTop: true
   };
   if(isChildApp) {
-    winOption.uuid = 'child' + Math.random();
-    winOption.name = 'child';
+    options.uuid = 'child' + Math.random();
+    options.name = 'child';
   }
   else {
-    winOption.name = 'child' + Math.random();
+    options.name = 'child' + Math.random();
   }
   if(!isInherited) {
-    winOption.url += '&permission=' + permissionValue;
-    winOption.permissions = {};
-    winOption.permissions.System = {};
-    winOption.permissions.System[apiName] = permissionValue;
+    options.url += '&permission=' + permissionValue;
+    options.permissions = {};
+    options.permissions.System = {};
+    options.permissions.System[apiName] = permissionValue;
   }
   else {
-    winOption.url += '&permission=none';
+    options.url += '&permission=none';
   }
-  return winOption;
+  return options;
 }
 
 function createChildApp() {
