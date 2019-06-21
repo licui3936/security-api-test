@@ -43,42 +43,42 @@ function onMain() {
 // expected permission map
 // key: DOS_manifest_windowOptions
 const expectedPermissionMap = new Map(Object.entries({
-  none_none: 'nack',
-  none_true: 'ack',
-  none_false: 'nack',
-  true_none: 'nack',
-  true_true: 'ack',
-  true_false: 'nack',
-  false_none: 'nack',
-  false_true: 'nack',
-  false_false: 'nack',  
-  none_none_none: 'nack',
-  none_none_true: 'nack',
-  none_none_false: 'nack',
-  none_true_none: 'nack',
-  none_true_true: 'ack',
-  none_true_false: 'nack',
-  none_false_none: 'nack',
-  none_false_true: 'nack',
-  none_false_false: 'nack',
-  true_none_none: 'nack',
-  true_none_true: 'nack',
-  true_none_false: 'nack',
-  true_true_none: 'nack',
-  true_true_true: 'ack',
-  true_true_false: 'nack',
-  true_false_none: 'nack',
-  true_false_true: 'nack',
-  true_false_false: 'nack',
-  false_none_none: 'nack',
-  false_none_true: 'nack',
-  false_none_false: 'nack',
-  false_true_none: 'nack',
-  false_true_true: 'nack',
-  false_true_false: 'nack',
-  false_false_none: 'nack',
-  false_false_true: 'nack',
-  false_false_false: 'nack'
+  none_none: 'NACK',
+  none_true: 'ACK',
+  none_false: 'NACK',
+  true_none: 'NACK',
+  true_true: 'ACK',
+  true_false: 'NACK',
+  false_none: 'NACK',
+  false_true: 'NACK',
+  false_false: 'NACK',  
+  none_none_none: 'NACK',
+  none_none_true: 'NACK',
+  none_none_false: 'NACK',
+  none_true_none: 'NACK',
+  none_true_true: 'ACK',
+  none_true_false: 'NACK',
+  none_false_none: 'NACK',
+  none_false_true: 'NACK',
+  none_false_false: 'NACK',
+  true_none_none: 'NACK',
+  true_none_true: 'NACK',
+  true_none_false: 'NACK',
+  true_true_none: 'NACK',
+  true_true_true: 'ACK',
+  true_true_false: 'NACK',
+  true_false_none: 'NACK',
+  true_false_true: 'NACK',
+  true_false_false: 'NACK',
+  false_none_none: 'NACK',
+  false_none_true: 'NACK',
+  false_none_false: 'NACK',
+  false_true_none: 'NACK',
+  false_true_true: 'NACK',
+  false_true_false: 'NACK',
+  false_false_none: 'NACK',
+  false_false_true: 'NACK',
+  false_false_false: 'NACK'
 }));
 
 function getPermissionMap() {
@@ -159,18 +159,18 @@ function getExpectedResult() {
   // If it's raw window, always nack 
   const isRawWindow = getUrlParam(window, "isRawWindow");
   if(isRawWindow) {
-    expected = 'nack';
+    expected = 'NACK';
   }
   else {
     //If applicationSettings object is empty, always nack
     const DOSPermissions = permissionMap['DOS'];
     if(typeof DOSPermissions === 'object' && Object.keys(DOSPermissions).length === 0) {
-      expected = 'nack';
+      expected = 'NACK';
     }
     else {
       let permissionKey = getDOSAndManifestPermission();
       if(permissionKey === '') { // url no match and no default
-        expected = 'nack';        
+        expected = 'NACK';        
       }
       else { // handle cases: no desktopOwnerSettings, no applicationSettings, url matched, url no match and has default,
         const isIframe = getUrlParam(window, "isIframe");
@@ -200,7 +200,7 @@ function executeAPICall(){
   let expectedHtml = "";
   if(showExpectedResult) {
     let expected = getExpectedResult();
-    expectedHtml = showExpectedResult? ("<span style='color: purple'>Expected: " + expected + "</span><br>") : expectedHtml;
+    expectedHtml = showExpectedResult? ("<br><span style='font-weight: bold; color: #F7882F'>Expected: " + expected + "</span>") : expectedHtml;
   }
 
   // update window option,permission is not working with updateOptions
@@ -225,8 +225,8 @@ function executeAPICall(){
         listener: function (result) {
           console.log('the exit code', result.exitCode);
         }        
-      }).then(payload => apiResponse.innerHTML = expectedHtml + "<span style='color: green'>Success: " + payload.uuid + "</span>")
-      .catch(error => apiResponse.innerHTML = expectedHtml + "<span style='color: red'>Error: " + error + "</span>");
+      }).then(payload => apiResponse.innerHTML = "<span style='color: #0b6623'>Success: " + payload.uuid + "</span>" + expectedHtml)
+      .catch(error => apiResponse.innerHTML = "<span style='color: red'>Error: " + error + "</span>" + expectedHtml);
   }
   else if(apiName === 'readRegistryValue') {
       // "HKEY_LOCAL_MACHINE", "HARDWARE\DESCRIPTION\System", "BootArchitecture"
@@ -236,8 +236,8 @@ function executeAPICall(){
       const valueName = document.querySelector("#valueName").value;
       fin.System.readRegistryValue(rootKey, subKey, valueName).then(response=> {
         console.log(response);
-        apiResponse.innerHTML =  expectedHtml + "<span style='color: green'>Success: data is " + response.data + "</span>";    
-      }).catch(error => apiResponse.innerHTML = expectedHtml + "<span style='color: red'>Error: " + error + "</span>");
+        apiResponse.innerHTML = "<span style='color: #0b6623'>Success: data is " + response.data + "</span>" + expectedHtml;    
+      }).catch(error => apiResponse.innerHTML = "<span style='color: red'>Error: " + error + "</span>" + expectedHtml);
   }
   else {
     apiResponse.innerText = '' + apiName + ' is currently not testable. ';
@@ -295,12 +295,11 @@ function getAPIName() {
   return apiOption;
 }
 
-function _createChildWindow(url) {
+function createOptions(url, isChildApp) {
   const isInherited = isInheritedPermission();
   const apiName = getAPIName();
   const permissionValue = document.querySelector("#permissionSel").value === 'true' ? true : false;
   let winOption = {
-      name:'child' + Math.random(),
       defaultWidth: 600,
       defaultHeight: 600,
       url: url +'?apiName=' + apiName,
@@ -308,6 +307,13 @@ function _createChildWindow(url) {
       autoShow: true,
       alwaysOnTop: true
   };
+  if(isChildApp) {
+    winOption.uuid = 'child' + Math.random();
+    winOption.name = 'child';
+  }
+  else {
+    winOption.name = 'child' + Math.random();
+  }
   if(!isInherited) {
     winOption.url += '&permission=' + permissionValue;
     winOption.permissions = {};
@@ -317,6 +323,16 @@ function _createChildWindow(url) {
   else {
     winOption.url += '&permission=none';
   }
+  return winOption;
+}
+
+function createChildApp() {
+  const option = createOptions(childUrl, true);
+  fin.Application.start(option);
+}
+
+function _createChildWindow(url) {
+  const winOption = createOptions(url, false);
   fin.Window.create(winOption);
 }
 
@@ -324,38 +340,13 @@ function createChildWindow() {
   _createChildWindow(childUrl);
 }
 
-function createWindow() {
+function createRawWindow() {
   const apiName = getAPIName();
   window.open(childUrl + '?isRawWindow=true&apiName=' + apiName);
 }
 
 function createIframeWindow() {
   _createChildWindow('http://localhost:5566/iframe.html');
-}
-
-function createChildApp() {
-  const isInherited = isInheritedPermission();
-  const apiName = getAPIName();
-  const permissionValue = document.querySelector("#permissionSel").value === 'true' ? true : false;
-  let option = {
-      uuid:'child' + Math.random(),
-      name:'child',
-      defaultWidth: 600,
-      defaultHeight: 600,
-      url: childUrl + '?apiName=' + apiName,
-      frame: true,
-      autoShow: true
-  };
-  if(!isInherited) {
-    option.url += '&permission=' + permissionValue;    
-    option.permissions = {};
-    option.permissions.System = {};
-    option.permissions.System[apiName] = permissionValue;
-  }
-  else {
-    option.url += '&permission=none';
-  }  
-  fin.Application.start(option);
 }
 
 function createAppFromManifest() {
