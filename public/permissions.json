@@ -3,7 +3,8 @@
       "file:///Z:/dev/security-api-test/public/app.json": {
 	      "permissions": {
 			    "System": {
-				    "downloadAsset": false,
+            "downloadAsset": false,
+            "launchExternalProcess": true,
 				    "readRegistryValue": false,
 				    "terminateExternalProcess": false
 			    }
@@ -27,7 +28,7 @@
         "permissions": {
           "System": {
             "downloadAsset": false,
-            "launchExternalProcess": true,
+            "launchExternalProcess": false,
             "readRegistryValue": false,
             "terminateExternalProcess": false
           }
