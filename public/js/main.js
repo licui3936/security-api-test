@@ -137,7 +137,6 @@ function getPermissionValue(permissiomObj) {
 
 async function getSubAppManifestPermission(manifestUrl) {
   const content = await fin.System.getLog({name: 'debug.log'});
-  const apiName = getAPIName();
   const appManifestSearchMsg = 'Contents from ' + manifestUrl;
   const index = content.indexOf(appManifestSearchMsg);
   let permission;
@@ -188,19 +187,18 @@ async function getManifestPermission(isSubApp, manifestUrl) {
 }
 
 async function getDOSAndManifestPermission() {
-  const apiName = getAPIName();
   const isSubApp = getUrlParam(window, "subApp");
   let DOSAPIPermission;
   let permission;
+  const appInfo = await getInfo();
+  const manifestUrl = appInfo.manifestUrl;
+  console.log('manifest url: ' + manifestUrl);  
   if(!isApplicationSettingsExist) {
     DOSAPIPermission = 'none';
-    permission = await getManifestPermission(isSubApp);
+    permission = await getManifestPermission(isSubApp, manifestUrl);
     return DOSAPIPermission + '_' + permission;
   }
   else {
-    const appInfo = await getInfo();
-    const manifestUrl = appInfo.manifestUrl;
-    console.log('manifest url: ' + manifestUrl);
     const DOSAPIPermissionObj = searchPermissionByConfigUrl(appInfo.manifestUrl);
     if(DOSAPIPermissionObj && Object.keys(DOSAPIPermissionObj).length === 0) {// no match, no default
       return '';
@@ -350,8 +348,7 @@ function searchPermissionByConfigUrl(url) {
   }
 }
 
-function isInheritedPermission()
-{
+function isInheritedPermission() {
     const inheritedRadio = document.getElementsByName("childPermission")[0];
     if(inheritedRadio.checked) {
       return true;
