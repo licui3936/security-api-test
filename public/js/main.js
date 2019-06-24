@@ -114,6 +114,27 @@ function getPermissionMap() {
   });
 }
 
+function getPermissionValue(permissiomObj) {
+  const apiName = getAPIName();
+  let value;
+  if(typeof permissiomObj.System[apiName] === 'object') { // readRegistryValue
+    const rootKey = document.querySelector("#rootKey").value;
+    const subKey = document.querySelector("#subKey").value;
+    const key = rootKey + '\\' + subKey;
+    const registryKeys = permissiomObj.System[apiName]['registryKeys'];
+    if(permissiomObj.System[apiName]['enabled'] && registryKeys.indexOf(key) >= 0){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+  else {
+    value = permissiomObj.System[apiName]
+  }
+  return value;
+}
+
 async function getSubAppManifestPermission(manifestUrl) {
   const content = await fin.System.getLog({name: 'debug.log'});
   const apiName = getAPIName();
@@ -128,7 +149,7 @@ async function getSubAppManifestPermission(manifestUrl) {
     const startupStr = content.substring(startIndex, endTopicIndex - 6);
     const startup = JSON.parse(startupStr);
     const permissiomObj = startup['permissions'];
-    permission = !permissiomObj? 'none' : (typeof permissiomObj.System[apiName] === 'object' ? permissiomObj.System[apiName]['enabled'] : permissiomObj.System[apiName]);
+    permission = !permissiomObj? 'none' : getPermissionValue(permissiomObj);
   }
   return permission;
 }
@@ -150,7 +171,6 @@ async function getInfo() {
 
 // get permissiom in manifest file
 async function getManifestPermission(isSubApp, manifestUrl) {
-  const apiName = getAPIName();
   let manifestPermission;
   if(isSubApp === 'true') {
     manifestPermission = await getSubAppManifestPermission(manifestUrl);
@@ -161,7 +181,7 @@ async function getManifestPermission(isSubApp, manifestUrl) {
       manifestPermission = 'none';
     }
     else {
-      manifestPermission = typeof permissiomObj.System[apiName] === 'object' ? permissiomObj.System[apiName]['enabled'] : permissiomObj.System[apiName];
+      manifestPermission = getPermissionValue(permissiomObj);
     }
   }
   return manifestPermission;
@@ -185,7 +205,7 @@ async function getDOSAndManifestPermission() {
     if(DOSAPIPermissionObj && Object.keys(DOSAPIPermissionObj).length === 0) {// no match, no default
       return '';
     }
-    DOSAPIPermission = typeof DOSAPIPermissionObj.System[apiName] === 'object' ? DOSAPIPermissionObj.System[apiName]['enabled'] : DOSAPIPermissionObj.System[apiName];
+    DOSAPIPermission = getPermissionValue(DOSAPIPermissionObj);
     permission = await getManifestPermission(isSubApp, manifestUrl);
     return DOSAPIPermission + '_' + permission;
   }
