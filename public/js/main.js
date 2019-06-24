@@ -309,7 +309,7 @@ function searchPermissionByConfigUrl(url) {
           else if (Array.isArray(permissionObj.urls)) { // alias
             const urls = permissionObj.urls;
             for(let i=0; i < urls.length; i++) {
-              if(urls[i] === url || urls[i].match(urlMatchPatten)) {
+              if(urls[i] === url || url.match(urlMatchPatten) !== null) {
                 isFound = true;
                 console.log('found: ' + url);
                 return permissionObj['permissions'];                
