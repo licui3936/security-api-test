@@ -3,7 +3,7 @@
     "licenseKey": "64605fac-add3-48a0-8710-64b38e96a2dd",
     "startup_app": {
         "name": "childAppTest",
-        "url": "http://localhost:5566/child.html",
+        "url": "http://localhost:5566/child.html?subApp=true",
         "uuid": "childAppTest",
         "icon": "http://localhost:5566/favicon.ico",
         "defaultWidth": 800,

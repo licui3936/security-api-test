@@ -114,6 +114,25 @@ function getPermissionMap() {
   });
 }
 
+async function getSubAppManifestPermission(manifestUrl) {
+  const content = await fin.System.getLog({name: 'debug.log'});
+  const apiName = getAPIName();
+  const appManifestSearchMsg = 'Contents from ' + manifestUrl;
+  const index = content.indexOf(appManifestSearchMsg);
+  let permission;
+  if(index > -1) {
+    const manifestMessage = '"startup_app": ';
+    const subIndex = content.indexOf(manifestMessage, index);
+    const startIndex = subIndex + manifestMessage.length;
+    const endTopicIndex = content.indexOf('"runtime": {', index);
+    const startupStr = content.substring(startIndex, endTopicIndex - 6);
+    const startup = JSON.parse(startupStr);
+    const permissiomObj = startup['permissions'];
+    permission = !permissiomObj? 'none' : (typeof permissiomObj.System[apiName] === 'object' ? permissiomObj.System[apiName]['enabled'] : permissiomObj.System[apiName]);
+  }
+  return permission;
+}
+
 function hideShowTextBoxes(value) {
   const hidenSpn = document.querySelector("#hidenSpan");
   if(value === 'readRegistryValue') {
@@ -124,33 +143,55 @@ function hideShowTextBoxes(value) {
   }
 }
 
-function getDOSAndManifestPermission() {
+async function getInfo() {
+  const app = await fin.Application.getCurrent();
+  return await app.getInfo();
+}
+
+// get permissiom in manifest file
+async function getManifestPermission(isSubApp, manifestUrl) {
   const apiName = getAPIName();
-  let DOSAPIPermission;
-  if(!isApplicationSettingsExist) {
-    DOSAPIPermission = 'none';
+  let manifestPermission;
+  if(isSubApp === 'true') {
+    manifestPermission = await getSubAppManifestPermission(manifestUrl);
   }
   else {
-    const DOSAPIPermissionObj = searchPermissionByConfigUrl('http://localhost:5566/app.json');
+    const permissiomObj = permissionMap['manifest'];
+    if(!permissiomObj) {
+      manifestPermission = 'none';
+    }
+    else {
+      manifestPermission = typeof permissiomObj.System[apiName] === 'object' ? permissiomObj.System[apiName]['enabled'] : permissiomObj.System[apiName];
+    }
+  }
+  return manifestPermission;
+}
+
+async function getDOSAndManifestPermission() {
+  const apiName = getAPIName();
+  const isSubApp = getUrlParam(window, "subApp");
+  let DOSAPIPermission;
+  let permission;
+  if(!isApplicationSettingsExist) {
+    DOSAPIPermission = 'none';
+    permission = await getManifestPermission(isSubApp);
+    return DOSAPIPermission + '_' + permission;
+  }
+  else {
+    const appInfo = await getInfo();
+    const manifestUrl = appInfo.manifestUrl;
+    console.log('manifest url: ' + manifestUrl);
+    const DOSAPIPermissionObj = searchPermissionByConfigUrl(appInfo.manifestUrl);
     if(DOSAPIPermissionObj && Object.keys(DOSAPIPermissionObj).length === 0) {// no match, no default
       return '';
     }
     DOSAPIPermission = typeof DOSAPIPermissionObj.System[apiName] === 'object' ? DOSAPIPermissionObj.System[apiName]['enabled'] : DOSAPIPermissionObj.System[apiName];
+    permission = await getManifestPermission(isSubApp, manifestUrl);
+    return DOSAPIPermission + '_' + permission;
   }
-
-  // get permissiom in manifest file
-  let manifestPermission;
-  const permissiomObj = permissionMap['manifest'];
-  if(!permissiomObj) {
-    manifestPermission = 'none';
-  }
-  else {
-    manifestPermission = typeof permissiomObj.System[apiName] === 'object' ? permissiomObj.System[apiName]['enabled'] : permissiomObj.System[apiName];
-  }
-  return DOSAPIPermission + '_' + manifestPermission;
 }
 
-function getExpectedResult() {
+async function getExpectedResult() {
   let expected;
   // If it's raw window, always nack 
   const isRawWindow = getUrlParam(window, "isRawWindow");
@@ -164,7 +205,7 @@ function getExpectedResult() {
       expected = 'NACK';
     }
     else {
-      let permissionKey = getDOSAndManifestPermission();
+      let permissionKey = await getDOSAndManifestPermission();
       if(permissionKey === '') { // url no match and no default
         expected = 'NACK';        
       }
@@ -195,12 +236,12 @@ function getResponseHtml(responseText, isError) {
   return "<span style='color:" + colorPart + responseText + "</span>";
 }
 
-function executeAPICall(){
+async function executeAPICall(){
   const apiName = getAPIName();
   const apiResponse = document.querySelector("#api-response");
   let expectedHtml = "";
   if(showExpectedResult) {
-    let expected = getExpectedResult();
+    let expected = await getExpectedResult();
     expectedHtml = showExpectedResult? ("<br><span style='font-weight: bold; color: #F7882F'>Expected: " + expected + "</span>") : expectedHtml;
   }
 
@@ -250,6 +291,7 @@ function hasDefaultPermissions() {
   return 'default' in apiPermissions;
 }
 
+let urlMatchPatten = '^http(s)?://localhost(:([0-9]){2,4})?/matched/.*$';
 function searchPermissionByConfigUrl(url) {
   const apiPermissions = permissionMap['DOS'];
   let defaultPermissions;
@@ -260,12 +302,20 @@ function searchPermissionByConfigUrl(url) {
           if(permissionName.toLowerCase() === 'default') {
             defaultPermissions = permissionObj['permissions'];
           }
-          if (Array.isArray(permissionObj.urls) && permissionObj.urls.indexOf(url) > -1) { // need to do more
-              isFound = true;
-              return permissionObj['permissions'];
-          } /*else if (electronApp.matchesURL(url,  [policyName])) {
-              return policy;
-          }*/
+          if(permissionName === url) {
+            isFound = true;
+            return permissionObj['permissions'];
+          }
+          else if (Array.isArray(permissionObj.urls)) { // alias
+            const urls = permissionObj.urls;
+            for(let i=0; i < urls.length; i++) {
+              if(urls[i] === url || urls[i].match(urlMatchPatten)) {
+                isFound = true;
+                console.log('found: ' + url);
+                return permissionObj['permissions'];                
+              }
+            }
+          }
       }
       if(!isFound) {
         if(defaultPermissions) {
