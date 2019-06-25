@@ -304,11 +304,6 @@ async function executeAPICall(){
   }
 }
 
-function hasDefaultPermissions() {
-  const apiPermissions = permissionMap['DOS'];
-  return 'default' in apiPermissions;
-}
-
 let urlMatchPatten = '^http(s)?://localhost(:([0-9]){2,4})?/matched/.*$';
 function searchPermissionByConfigUrl(url) {
   const apiPermissions = permissionMap['DOS'];
@@ -348,25 +343,17 @@ function searchPermissionByConfigUrl(url) {
   }
 }
 
-function isInheritedPermission() {
-    const inheritedRadio = document.getElementsByName("childPermission")[0];
-    if(inheritedRadio.checked) {
-      return true;
-    }
-    else {
-      return false;
-    }
-}
-
 function getAPIName() {
   const apiOption = document.querySelector("#apiSelect").value;
   return apiOption;
 }
 
-function createOptions(url, isChildApp) {
-  const isInherited = isInheritedPermission();
+function createOptions(url, isChildApp, isIframe) {
   const apiName = getAPIName();
-  const permissionValue = document.querySelector("#permissionSel").value === 'true' ? true : false;
+  const permissionValue1 = document.querySelector('#childPermissionSel1').value;
+  const permissionValue2 = document.querySelector('#childPermissionSel2').value;
+  const permissionValue = !isIframe? permissionValue1 : permissionValue2;
+
   let options = {
       defaultWidth: 600,
       defaultHeight: 600,
@@ -382,30 +369,25 @@ function createOptions(url, isChildApp) {
   else {
     options.name = 'child' + Math.random();
   }
-  if(!isInherited) {
-    options.url += '&permission=' + permissionValue;
+
+  options.url += '&permission=' + permissionValue;
+  if(permissionValue !== 'none') {
     options.permissions = {};
     options.permissions.System = {};
-    options.permissions.System[apiName] = permissionValue;
+    options.permissions.System[apiName] = (permissionValue === 'true');
   }
-  else {
-    options.url += '&permission=none';
-  }
+
   return options;
 }
 
 function createChildApp() {
-  const option = createOptions(childUrl, true);
+  const option = createOptions(childUrl, true, false);
   fin.Application.start(option);
 }
 
-function _createChildWindow(url) {
-  const winOption = createOptions(url, false);
-  fin.Window.create(winOption);
-}
-
 function createChildWindow() {
-  _createChildWindow(childUrl);
+  const winOption = createOptions(childUrl, false, false);
+  fin.Window.create(winOption);  
 }
 
 function createRawWindow() {
@@ -414,7 +396,8 @@ function createRawWindow() {
 }
 
 function createIframeWindow() {
-  _createChildWindow('http://localhost:5566/iframe.html');
+  const winOption = createOptions('http://localhost:5566/iframe.html', false, true);
+  fin.Window.create(winOption);  
 }
 
 function createAppFromManifest() {
