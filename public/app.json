@@ -15,12 +15,13 @@
             "green": 200,
             "blue": 200
         },
+        "frameConnect": "all",
         "accelerator": {
             "zoom": true
         },
         "api": {
             "iframe": {
-                "crossOriginInjection": false
+                "crossOriginInjection": true
             }
         },        
         "cornerRounding": {
