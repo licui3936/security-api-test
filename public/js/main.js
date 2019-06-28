@@ -3,13 +3,15 @@ document.addEventListener("DOMContentLoaded", () => {
   onMain();
 });
 
+// global
+var permissionMap;
+
 const childUrl = 'http://localhost:5566/child.html';
-let permissionMap;
 let isApplicationSettingsExist = false;
 const showExpectedResult = true;
 
 //Once the DOM has loaded and the OpenFin API is ready
-function onMain() {
+async function onMain() {
   const ofVersion = document.querySelector("#of-version");
   if(ofVersion) {
     fin.System.getVersion().then(version => {    
@@ -18,9 +20,8 @@ function onMain() {
   }
 
   //get permission
-  if(showExpectedResult && !permissionMap) {
-    getPermissionMap();
-    console.log(permissionMap);
+  if(showExpectedResult) {
+    await getPermissionMap();
   }
 
   // set selected item
@@ -31,7 +32,7 @@ function onMain() {
   updateIframeSrc(apiName);     
   if(apiSelect && apiName) {
     apiSelect.value = apiName;
-    // Selection is not allowed in chile window
+    // Selection is not allowed in child window
     if(window.location.href.indexOf('child') > -1) {
       apiSelect.disabled = true;
     }
@@ -81,9 +82,21 @@ const expectedPermissionMap = new Map(Object.entries({
   false_false_false: 'NACK'
 }));
 
-function getPermissionMap() {
+async function getAppInfo() {
+  const app = await fin.Application.getCurrent();
+  return await app.getInfo();
+}
+
+async function getPermissionMap() {
+  let localPermissionMap = parent.permissionMap || (window.opener && window.opener.permissionMap);
+  if(localPermissionMap) {
+    permissionMap = localPermissionMap;
+    console.log('get from parent');
+    return;
+  }
+  console.log('read from debug.log');  
   permissionMap = {};
-  fin.desktop.System.getLog('debug.log', content => {
+  const content = await fin.System.getLog({name: 'debug.log'});
     // check if applicationSettings exists
     isApplicationSettingsExist = /"applicationSettingsExists":true/.test(content);
     console.log('applicationSettings exists: ' + isApplicationSettingsExist);
@@ -100,18 +113,11 @@ function getPermissionMap() {
         permissionMap['DOS'] = applicationSetting;
       }
     }
+
     // find permission in manifest file app.json
-    const manifestMessage = '"startup_app": ';
-    const index = content.indexOf(manifestMessage);
-    if(index > -1) {
-      const startIndex = index + manifestMessage.length;
-      const endTopicIndex = content.indexOf('"runtime": {');
-      const startupStr = content.substring(startIndex, endTopicIndex - 6);
-      const startup = JSON.parse(startupStr);
-      const manifestPermissions = startup['permissions'];
-      permissionMap['manifest'] = manifestPermissions;
-    }
-  });
+    const appInfo = await getAppInfo()
+    const manifestPermissions = appInfo.manifest.startup_app.permissions;
+    permissionMap['manifest'] = manifestPermissions;
 }
 
 function getPermissionValue(permissiomObj) {
@@ -448,7 +454,7 @@ function getUrlParam(win, param) {
 }
 
 function updateHref(aLink) {
-  aLink.href = childUrl + "?isRawWindow&apiName=" + getAPIName();
+  aLink.href = childUrl + "?isRawWindow=true&apiName=" + getAPIName();
 }
 
 function updateIframeSrc(apiName) {
