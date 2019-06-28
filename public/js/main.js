@@ -110,7 +110,7 @@ function getPermissionMap() {
       const startup = JSON.parse(startupStr);
       const manifestPermissions = startup['permissions'];
       permissionMap['manifest'] = manifestPermissions;
-    }    
+    }
   });
 }
 
@@ -136,10 +136,13 @@ function getPermissionValue(permissiomObj) {
 }
 
 async function getSubAppManifestPermission(manifestUrl) {
+  let permission = 'none';
+  // read permission option from debug.log
+  /*
   const content = await fin.System.getLog({name: 'debug.log'});
   const appManifestSearchMsg = 'Contents from ' + manifestUrl;
   const index = content.indexOf(appManifestSearchMsg);
-  let permission;
+
   if(index > -1) {
     const manifestMessage = '"startup_app": ';
     const subIndex = content.indexOf(manifestMessage, index);
@@ -149,6 +152,17 @@ async function getSubAppManifestPermission(manifestUrl) {
     const startup = JSON.parse(startupStr);
     const permissiomObj = startup['permissions'];
     permission = !permissiomObj? 'none' : getPermissionValue(permissiomObj);
+  }*/
+
+  // use url to determine permission value
+  if(manifestUrl.indexOf('True') > -1) {
+    permission = 'true';
+  }
+  else if(manifestUrl.indexOf('False') > -1) {
+    permission = 'false';
+  }
+  else {
+    permission = 'none';
   }
   return permission;
 }
@@ -228,7 +242,7 @@ async function getExpectedResult() {
         expected = 'NACK';        
       }
       else { // handle cases: no desktopOwnerSettings, no applicationSettings, url matched, url no match and has default,
-        const isIframe = getUrlParam(window, "isIframe");
+        const isIframe = getUrlParam(window, 'isIframe') || getUrlParam(parent, 'isIframe');
         if(!isIframe && window.location.href.indexOf('child') > -1) { // child window
           let permissionValue = getUrlParam(window, "permission");
           if(permissionValue) { // child window
@@ -439,8 +453,14 @@ function updateHref(aLink) {
 
 function updateIframeSrc(apiName) {
   const iframeTest = document.querySelector("#iframe_test");
-  if(iframeTest) {
+  if(iframeTest && apiName) {
     iframeTest.setAttribute('src', childUrl + "?apiName=" + apiName);
   }
+
+  // iframe inside another iframe
+  const iframeIframeTest = document.querySelector("#iframe_iframe_test");
+  if(iframeIframeTest && apiName) {
+    iframeIframeTest.setAttribute('src', childUrl + "?apiName=" + apiName);
+  }  
 }
  

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>OpenFin Security API Test - IFrame</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body style="background-color: #f1f0ea">
+  <div>
+    <table style="width: 100%">
+      <tr>
+        <td style='vertical-align: top; width: 50%'>
+        <h3>Secured APIs in Phase 1</h3>
+        <select id="apiSelect" onchange="hideShowTextBoxes(value)">
+          <option value="downloadAsset" disabled>downloadAsset</option>
+          <option value="launchExternalProcess" selected>launchExternalProcess</option>
+          <option value="readRegistryValue">readRegistryValue</option>
+          <option value="terminateExternalProcess" disabled>terminateExternalProcess</option>
+        </select>
+        <span id="hidenSpan" style="display: none">
+          Root Key: <input type="text" id="rootKey" value="HKEY_LOCAL_MACHINE">
+          Sub Key: <input type="text" id="subKey" value="HARDWARE\DESCRIPTION\System">
+          Value Name: <input type="text" id="valueName" value="BootArchitecture">
+        </span>    
+        <button onclick="executeAPICall()">Execute</button>
+        <br>
+        <h4>API call response: </h4><span id="api-response" style="color: green"></span>
+      </td>
+      <td style="vertical-align: top; width: 50%">    
+        <iframe src="http://localhost:5566/child.html" id="iframe_iframe_test" width="100%" height="600" allowfullscreen>
+          <p>Your browser does not support iframes.</p>
+        </iframe>
+      </td>
+    </tr>
+  </table>
+  </div>
+  <script src="js/main.js"></script>  
+</body>
+</html>

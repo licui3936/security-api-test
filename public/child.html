@@ -10,8 +10,7 @@
 
 <body style="background-color:#f1f0ea">
   <div>
-    <h2>OpenFin Security API Test - Child Window</h2>
-    <h3>Secured APIs in Phase 1</h3>
+    <h3>Secured APIs in Phase 1 (child page)</h3>
     <select id="apiSelect" onchange="hideShowTextBoxes(value)">
       <option value="downloadAsset" disabled>downloadAsset</option>
       <option value="launchExternalProcess" selected>launchExternalProcess</option>
@@ -25,11 +24,11 @@
       Root Key: <input type="text" id="rootKey" value="HKEY_LOCAL_MACHINE">
       Sub Key: <input type="text" id="subKey" value="HARDWARE\DESCRIPTION\System">
       Value Name: <input type="text" id="valueName" value="BootArchitecture">
-      </span>    
+    </span>    
     <button onclick="executeAPICall()">Execute</button>
     <br>
     <h4>API call response in child window: </h4><span id="api-response" style="color: green"></span>
   </div>  
   <script src="js/main.js"></script>
 </body>
-</html>
+</htm
