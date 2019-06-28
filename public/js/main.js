@@ -142,35 +142,10 @@ function getPermissionValue(permissiomObj) {
 }
 
 async function getSubAppManifestPermission(manifestUrl) {
-  let permission = 'none';
-  // read permission option from debug.log
-  /*
-  const content = await fin.System.getLog({name: 'debug.log'});
-  const appManifestSearchMsg = 'Contents from ' + manifestUrl;
-  const index = content.indexOf(appManifestSearchMsg);
-
-  if(index > -1) {
-    const manifestMessage = '"startup_app": ';
-    const subIndex = content.indexOf(manifestMessage, index);
-    const startIndex = subIndex + manifestMessage.length;
-    const endTopicIndex = content.indexOf('"runtime": {', index);
-    const startupStr = content.substring(startIndex, endTopicIndex - 6);
-    const startup = JSON.parse(startupStr);
-    const permissiomObj = startup['permissions'];
-    permission = !permissiomObj? 'none' : getPermissionValue(permissiomObj);
-  }*/
-
-  // use url to determine permission value
-  if(manifestUrl.indexOf('True') > -1) {
-    permission = 'true';
-  }
-  else if(manifestUrl.indexOf('False') > -1) {
-    permission = 'false';
-  }
-  else {
-    permission = 'none';
-  }
-  return permission;
+  // read permission option from app info
+  const appInfo = await getAppInfo();
+  const permissiomObj = appInfo.manifest.startup_app.permissions;
+  return !permissiomObj? 'none' : getPermissionValue(permissiomObj);
 }
 
 function hideShowTextBoxes(value) {
@@ -181,11 +156,6 @@ function hideShowTextBoxes(value) {
   else {
     hidenSpn.style.display = "none";
   }
-}
-
-async function getInfo() {
-  const app = await fin.Application.getCurrent();
-  return await app.getInfo();
 }
 
 // get permissiom in manifest file
@@ -210,7 +180,7 @@ async function getDOSAndManifestPermission() {
   const isSubApp = getUrlParam(window, "subApp");
   let DOSAPIPermission;
   let permission;
-  const appInfo = await getInfo();
+  const appInfo = await getAppInfo();
   const manifestUrl = appInfo.manifestUrl;
   console.log('manifest url: ' + manifestUrl);  
   if(!isApplicationSettingsExist) {
@@ -423,22 +393,22 @@ function createIframeWindow() {
 function createAppFromManifest() {
   const useCase = document.querySelector("#manifestSelect").value;
   if(useCase === '0') { // no match url, use default settings,  permission missing in manifest
-    fin.Application.startFromManifest('http://localhost:5566/unmatched/appNoMatchPermissionMissing.json').then(app => console.log('App is running')).catch(err => console.log(err));
+    fin.Application.startFromManifest('http://localhost:5566/unmatched/appNoMatchPermissionMissing.json').then(app => console.log('App0 is running')).catch(err => console.log(err));
   }  
   else if(useCase === '1') { // no match url, use default settings,  permission true in manifest
-    fin.Application.startFromManifest('http://localhost:5566/unmatched/appNoMatchPermissionTrue.json').then(app => console.log('App is running')).catch(err => console.log(err));
+    fin.Application.startFromManifest('http://localhost:5566/unmatched/appNoMatchPermissionTrue.json').then(app => console.log('App1 is running')).catch(err => console.log(err));
   }
   else if(useCase === '2') { // no match url, use default settings, permission false in manifest
-    fin.Application.startFromManifest('http://localhost:5566/unmatched/appNoMatchPermissionFalse.json').then(app => console.log('App is running')).catch(err => console.log(err));
+    fin.Application.startFromManifest('http://localhost:5566/unmatched/appNoMatchPermissionFalse.json').then(app => console.log('App2 is running')).catch(err => console.log(err));
   }
   else if(useCase === '3') { // match url, permissions missing in manifest
-    fin.Application.startFromManifest('http://localhost:5566/matched/appMatchPermissionMissing.json').then(app => console.log('App is running')).catch(err => console.log(err));
+    fin.Application.startFromManifest('http://localhost:5566/matched/appMatchPermissionMissing.json').then(app => console.log('App3 is running')).catch(err => console.log(err));
   }
   else if(useCase === '4') { // match url, permissions true in manifest
-    fin.Application.startFromManifest('http://localhost:5566/matched/appMatchPermissionTrue.json').then(app => console.log('App is running')).catch(err => console.log(err));
+    fin.Application.startFromManifest('http://localhost:5566/matched/appMatchPermissionTrue.json').then(app => console.log('App4 is running')).catch(err => console.log(err));
   } 
   else if(useCase === '5') { // match url, permissions false in manifest
-    fin.Application.startFromManifest('http://localhost:5566/matched/appMatchPermissionFalse.json').then(app => console.log('App is running')).catch(err => console.log(err));
+    fin.Application.startFromManifest('http://localhost:5566/matched/appMatchPermissionFalse.json').then(app => console.log('App5 is running')).catch(err => console.log(err));
   }    
 }
 
