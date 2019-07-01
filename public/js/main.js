@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
 var permissionMap;
 
 const childUrl = 'http://localhost:5566/child.html';
-let isApplicationSettingsExist = false;
 const showExpectedResult = true;
 
 //Once the DOM has loaded and the OpenFin API is ready
@@ -98,8 +97,9 @@ async function getPermissionMap() {
   permissionMap = {};
   const content = await fin.System.getLog({name: 'debug.log'});
     // check if applicationSettings exists
-    isApplicationSettingsExist = /"applicationSettingsExists":true/.test(content);
+    const isApplicationSettingsExist = /"applicationSettingsExists":true/.test(content);
     console.log('applicationSettings exists: ' + isApplicationSettingsExist);
+    permissionMap['isApplicationSettingsExist'] = isApplicationSettingsExist;
 
     // find permission in desktop owner settings
     if(isApplicationSettingsExist) {
@@ -183,7 +183,7 @@ async function getDOSAndManifestPermission() {
   const appInfo = await getAppInfo();
   const manifestUrl = appInfo.manifestUrl;
   console.log('manifest url: ' + manifestUrl);  
-  if(!isApplicationSettingsExist) {
+  if(!permissionMap['isApplicationSettingsExist']) {
     DOSAPIPermission = 'none';
     permission = await getManifestPermission(isSubApp, manifestUrl);
     return DOSAPIPermission + '_' + permission;
