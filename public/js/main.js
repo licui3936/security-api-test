@@ -87,6 +87,7 @@ async function getAppInfo() {
 }
 
 async function getPermissionMap() {
+  // iframe, raw window
   let localPermissionMap = parent.permissionMap || (window.opener && window.opener.permissionMap);
   if(localPermissionMap) {
     permissionMap = localPermissionMap;
@@ -340,8 +341,11 @@ function getAPIName() {
 
 function createOptions(url, isChildApp, isIframe) {
   const apiName = getAPIName();
-  const permissionValue1 = document.querySelector('#childPermissionSel1').value;
-  const permissionValue2 = document.querySelector('#childPermissionSel2').value;
+  const childPermissionSel1 = document.querySelector('#childPermissionSel1');
+  // child window inside iframe will use 'true' value
+  const permissionValue1 = (childPermissionSel1 && childPermissionSel1.value) || 'true';
+  const childPermissionSel2 = document.querySelector('#childPermissionSel2');
+  const permissionValue2 = (childPermissionSel2 && childPermissionSel2.value) || 'true';
   const permissionValue = !isIframe? permissionValue1 : permissionValue2;
 
   let options = {
