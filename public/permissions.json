@@ -28,8 +28,8 @@
         "permissions": {
           "System": {
             "downloadAsset": false,
-            "launchExternalProcess": false,
-            "readRegistryValue": false,
+            "launchExternalProcess": true,
+            "readRegistryValue": true,
             "terminateExternalProcess": false
           }
         }
