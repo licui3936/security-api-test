@@ -25,7 +25,9 @@
           Sub Key: <input type="text" id="subKey" value="HARDWARE\DESCRIPTION\System">
           Value Name: <input type="text" id="valueName" value="BootArchitecture">
         </span>    
-        <button onclick="executeAPICall()">Execute</button>&nbsp;&nbsp;<button onclick="createChildWindow()">Open Child Window</button>
+        <button onclick="executeAPICall()">Execute</button><br>
+        <button onclick="createChildWindow('true')">Open Child Window with True permission</button><br>
+        <button onclick="createChildWindow('false')">Open Child Window with False permission</button>
         <br>
         <h4>API call response: </h4><span id="api-response" style="color: green"></span>
       </td>

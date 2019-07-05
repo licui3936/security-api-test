@@ -43,7 +43,7 @@
       <option value="true">True</option>
       <option value="false">False</option>
     </select>&nbsp;&nbsp;&nbsp;&nbsp;
-    <button onclick="createChildApp()">Open Child App</button>&nbsp;&nbsp;&nbsp;<button onclick="createChildWindow()">Open Child Window</button>
+    <button onclick="createChildApp('#childPermissionSel1')">Open Child App</button>&nbsp;&nbsp;&nbsp;<button onclick="createChildWindow('#childPermissionSel1')">Open Child Window</button>
     <br>
 
     <!-- Test permission in raw window. It should always be denied in raw window. -->
@@ -76,7 +76,7 @@
      <option value="true">True</option>
      <option value="false">False</option>
    </select>
-    <button onclick="createIframeWindow()">Open a Child Window with Iframe In it</button>    
+    <button onclick="createIframeWindow('#childPermissionSel2')">Open a Child Window with Iframe In it</button>    
   </div>  
 </body>
 </html>

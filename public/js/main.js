@@ -339,15 +339,8 @@ function getAPIName() {
   return apiOption;
 }
 
-function createOptions(url, isChildApp, isIframe) {
+function createOptions(url, permissionValue, isChildApp) {
   const apiName = getAPIName();
-  const childPermissionSel1 = document.querySelector('#childPermissionSel1');
-  // child window inside iframe will use 'true' value
-  const permissionValue1 = (childPermissionSel1 && childPermissionSel1.value) || 'true';
-  const childPermissionSel2 = document.querySelector('#childPermissionSel2');
-  const permissionValue2 = (childPermissionSel2 && childPermissionSel2.value) || 'true';
-  const permissionValue = !isIframe? permissionValue1 : permissionValue2;
-
   let options = {
       defaultWidth: 600,
       defaultHeight: 600,
@@ -374,13 +367,16 @@ function createOptions(url, isChildApp, isIframe) {
   return options;
 }
 
-function createChildApp() {
-  const option = createOptions(childUrl, true, false);
+function createChildApp(selectEleName) {
+  const permissonValue = document.querySelector(selectEleName).value;
+  const option = createOptions(childUrl, permissonValue, true);
   fin.Application.start(option);
 }
 
-function createChildWindow() {
-  const winOption = createOptions(childUrl, false, false);
+function createChildWindow(selectEleNameOrValue) {
+  const permissionSel = document.querySelector(selectEleNameOrValue);
+  const permissonValue =permissionSel? permissionSel.value : selectEleNameOrValue;
+  const winOption = createOptions(childUrl, permissonValue, false);
   fin.Window.create(winOption);  
 }
 
@@ -389,8 +385,9 @@ function createRawWindow() {
   window.open(childUrl + '?isRawWindow=true&apiName=' + apiName);
 }
 
-function createIframeWindow() {
-  const winOption = createOptions('http://localhost:5566/iframe.html', false, true);
+function createIframeWindow(selectEleName) {
+  const permissonValue = document.querySelector(selectEleName).value;
+  const winOption = createOptions('http://localhost:5566/iframe.html', permissonValue, false);
   fin.Window.create(winOption);  
 }
 
