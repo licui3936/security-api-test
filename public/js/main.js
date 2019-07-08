@@ -13,14 +13,16 @@ const showExpectedResult = true;
 async function onMain() {
   const ofVersion = document.querySelector("#of-version");
   if(ofVersion) {
-    fin.System.getVersion().then(version => {    
+    fin.System.getVersion().then(version => {
       ofVersion.innerText = version;
     });
   }
 
   //get permission
   if(showExpectedResult) {
-    await getPermissionMap();
+    if(window.location.href.indexOf('subApp=true') === -1) {
+      await getPermissionMap();
+    }
   }
 
   // set selected item
@@ -87,6 +89,8 @@ async function getAppInfo() {
 }
 
 async function getPermissionMap() {
+  if(permissionMap) return;
+
   // iframe, raw window
   let localPermissionMap = parent.permissionMap || (window.opener && window.opener.permissionMap);
   if(localPermissionMap) {
@@ -208,6 +212,12 @@ async function getExpectedResult() {
     expected = 'NACK';
   }
   else {
+    // check if permisonMap is ready. If it's not, read info from debug.log. It could happen in the app opening with manifest url
+    if(!permissionMap) {
+      console.log('---read debug log---');
+      await getPermissionMap();
+    }
+    
     //If applicationSettings object is empty, always nack
     const DOSPermissions = permissionMap['DOS'];
     if(typeof DOSPermissions === 'object' && Object.keys(DOSPermissions).length === 0) {
