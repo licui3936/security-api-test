@@ -21,9 +21,9 @@ HKEY_CURRENT_USER\Software\OpenFin\RVM\Settings\DesktopOwnerSettings=http://loca
 * Start the live-server and launch the application: `npm start`
 
 ### Test external connection, you can run below two scripts
-* node launchFromAppOptions.js  (This one requires that a runtime is already running.)
-* node launchFromManifest.js
+* `node launchFromAppOptions.js`  (This one requires that a runtime is already running.)
+* `node launchFromManifest.js`
 
 
 ### You can manually change the permission in permissions.json and play around it.
-* [Expected Results:](https://docs.google.com/spreadsheets/d/17Orjr0Sf-Z7Ay-lnY-t_ZB1BjNxyaFpxIIxFRH2qHEk/edit#gid=580648240)
+* [Expected Results](https://docs.google.com/spreadsheets/d/17Orjr0Sf-Z7Ay-lnY-t_ZB1BjNxyaFpxIIxFRH2qHEk/edit#gid=580648240)
