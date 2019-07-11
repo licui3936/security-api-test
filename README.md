@@ -18,9 +18,8 @@ HKEY_CURRENT_USER\Software\OpenFin\RVM\Settings\DesktopOwnerSettings=http://loca
 
 ### To run the example
 
-1. host the repo at localhost:5566
-2. run
-    OpenFinRVM.exe --config=http://localhost:5566/app.json
+* Install the dependencies: `cd security-api-test` & `npm install`
+* Start the live-server and launch the application: `npm start`
 
 ### Test external connection, you can run below two scripts
 node launchFromAppOptions.js  (This one requires that a runtime is already running.)
