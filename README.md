@@ -1,10 +1,10 @@
 # Security API test application
 
 Test harness is to test APIs security. Currently only below APIs are set permission to FALSE by default. Desktop owner settings uses permissions.json to specify permission for each API. You can change permission in app manifiest file or use options object to set permission option. 
-    downloadAsset
-    launchExternalProcess
-    readRegistryValue
-    terminateExternalProcess
+* downloadAsset
+* launchExternalProcess
+* readRegistryValue
+* terminateExternalProcess
 
 In order to test different use cases, you need to manually change permission value in permissions.json or app manifest app.json. 
 ### How to use this:
@@ -18,7 +18,6 @@ HKEY_CURRENT_USER\Software\OpenFin\RVM\Settings\DesktopOwnerSettings=http://loca
 
 ### To run the example
 
-* Install the dependencies: `cd security-api-test` & `npm install`
 * Start the live-server and launch the application: `npm start`
 
 ### Test external connection, you can run below two scripts
